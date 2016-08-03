@@ -1,4 +1,4 @@
-# C++ Dtastrutures #
+# C++ Data strutures #
 
 
 This repo contains my implementations of common data structures for aesthetic purposes. 
