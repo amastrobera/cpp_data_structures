@@ -7,7 +7,8 @@ This repo contains my implementations of common data structures for aesthetic pu
 A file for each structure and its unit test. 
 
 * interval map (derived from c++11 std::map)
-
+* linked_list, singly (c++03, naked pointers, built with "make")
 
 ### todo ###
-* singly linked list (implemented with naked pointers)
+* linked_list: implementation in .h/.cpp
+* linked_list: valgrind test 
