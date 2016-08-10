@@ -9,26 +9,19 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-#include <iostream>
+#include "my_node.h"
+
 #include <stdexcept>
 
 namespace my_data_structures 
 {
-
-template<typename T>
-struct Node
-{
-    Node(T const& v): value(v), next (NULL) {}
-    T value;
-    Node* next;
-};
 
 //it allows simple types only. For classes specify the operator==
 template<typename T> 
 class MyList
 {
 public:
-    MyList() : d_size(0), d_root(NULL) {}
+    MyList() : d_root(NULL), d_size(0) {}
 
     ~MyList();
 
@@ -46,7 +39,7 @@ public:
     T const& bottom();
     //returns the k-th item of the list; throws it out of range
     T const& at(unsigned const k);
-    //returns the item at the top of the list and deletes it
+    //returns the item ats the top of the list and deletes it
     T pop();
 
     //deletes the first occurrence of a given value
@@ -58,9 +51,6 @@ private:
     Node<T>* d_root;
     unsigned d_size;
 };
-
-
-// IMPLEMENTATION WTF 
 
 template<typename T>
 MyList<T>::~MyList()
@@ -198,8 +188,6 @@ void MyList<T>::removeAll(T const& value)
         --d_size;
     }
 }
-
-
 
 } //my_data_structures
 

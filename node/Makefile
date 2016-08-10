@@ -1,15 +1,15 @@
 # Makefile for my_list.t C++ test application
 
 #variables 
-PROG		= my_list.test
+PROG		= my_node.test
 
-MAIN		= my_list.t.cpp
-LIBS_H		= my_list.h
-LIBS_CPP	= my_list.cpp
-OBJS		= my_list.o my_list.t.o
+MAIN		= my_node.t.cpp
+LIBS_H		= my_node.h
+LIBS_CPP	= my_node.cpp
+OBJS		= my_node.o my_node.t.o
 
 CC			= g++
-CPPFLAGS	= -g -Wall -I. -I../node/
+CPPFLAGS	= -g -Wall -I. 
 
 #commands
 build: compile link
