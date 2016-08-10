@@ -9,7 +9,7 @@ LIBS_CPP	= my_node.cpp
 OBJS		= my_node.o my_node.t.o
 
 CC			= g++
-CPPFLAGS	= -g -Wall -I. 
+CPPFLAGS	= -g -Wall -I.
 
 #commands
 build: compile link
@@ -18,7 +18,6 @@ link:
 	$(CC) -o $(PROG) $(OBJS)
 
 compile : $(LIBS_H)
-#	$(CC) $(CPPFLAGS) -c $(LIBS_CPP)
 	$(CC) $(CPPFLAGS) -c $(MAIN) $(LIBS_CPP)
 
 clean: 

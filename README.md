@@ -14,8 +14,11 @@ If the implementation includes naked pointers, memory leaks are checked with Val
 C++03, naked pointers, built with Makefile
 
 * node, single and double 
-* linked_list, singly
+* linked_list single
+* linked_list unordered single
+
 
 ### todo ###
-* linked list, double + class structure + node class 
+* Makefile across multiple folders
+* linked list double
 * map (as a normal tree, if possible as a RB tree)
