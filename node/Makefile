@@ -1,4 +1,4 @@
-# Makefile for my_list.t C++ test application
+# Makefile for C++ test application
 
 #variables 
 PROG		= test_my_node

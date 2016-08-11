@@ -1,19 +1,15 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_single_list
+PROG		= test_my_dynamic_array
 
-MAIN		= my_single_list.t.cpp
-
-LIBS_H		= my_single_list.h
-
-LIBS_CPP	= my_single_list.cpp
-
-OBJS		= my_single_list.t.o \
-			  $(patsubst %.o,../unsorted/%.o, my_single_unsorted_list.o)
+MAIN		= my_dynamic_array.t.cpp
+LIBS_H		= my_dynamic_array.h
+LIBS_CPP	= my_dynamic_array.cpp
+OBJS		= my_dynamic_array.o my_dynamic_array.t.o
 
 CC			= g++
-CPPFLAGS	= -g -Wall -I. -I../unsorted -I../../list -I../../../node
+CPPFLAGS	= -g -Wall -I.
 
 #commands
 build: compile link
@@ -29,9 +25,6 @@ clean:
 
 test: #run unit test
 	./$(PROG)
-
-debug:
-	gdb $(PROG)
 
 memory: #test of memory leak
 	valgrind ./$(PROG)
