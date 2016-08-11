@@ -19,6 +19,6 @@ C++03, naked pointers, built with Makefile
 
 
 ### todo ###
-* Makefile across multiple folders
+* dynamic array (vector)
 * linked list double
 * map (as a normal tree, if possible as a RB tree)

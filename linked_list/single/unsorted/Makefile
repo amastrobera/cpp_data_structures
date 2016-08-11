@@ -1,0 +1,38 @@
+# Makefile for my_list.t C++ test application
+
+#variables 
+PROG		= test_single_unsorted_list
+
+MAIN		= my_single_unsorted_list.t.cpp
+
+LIBS_H		= my_single_unsorted_list.h 
+
+LIBS_CPP	= my_single_unsorted_list.cpp
+
+OBJS		= my_single_unsorted_list.t.o \
+			  $(patsubst %.o,../../list/%.o, my_list.o) \
+			  my_single_unsorted_list.o 
+
+CC			= g++
+CPPFLAGS	= -g -Wall -I. -I../../list -I../../../node
+
+#commands
+build: compile link
+
+link: 
+	$(CC) -o $(PROG) $(OBJS)
+
+compile : $(LIBS_H)
+	$(CC) $(CPPFLAGS) -c $(MAIN) $(LIBS_CPP)
+
+clean: 
+	rm -f core $(PROG) $(OBJS)
+
+test: #run unit test
+	./$(PROG)
+
+debug:
+	gdb $(PROG)
+
+memory: #test of memory leak
+	valgrind ./$(PROG)
