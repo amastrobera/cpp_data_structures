@@ -13,13 +13,15 @@ If the implementation includes naked pointers, memory leaks are checked with Val
 #### Making containiers from scratch  ####
 C++03, naked pointers, built with Makefile
 
-* dynamic array (good to implement doubleNode or a Stack)
+* dynamic array (good to implement doubleNode, Stack/Queue)
 * node, single and double 
-* linked_list unordered single (good to implement a Stack)
+* linked_list unordered single (good to implement Stack/Queue)
 * linked_list single
 
 
 ### todo ###
-* more functions in dynamic array (vector)
+* build script simple
 * linked list double
 * map (as a normal tree, if possible as a RB tree)
+* build script concurrent
+* iterators for all 

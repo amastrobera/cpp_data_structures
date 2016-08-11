@@ -20,7 +20,7 @@ public:
     virtual ~List() {};
 
     //how many items are in the list
-    inline unsigned size() {return d_size;}
+    inline unsigned size() const {return d_size;}
 
     //adds a value at the bottom of the list
     virtual void append(T const& value) = 0;
@@ -28,11 +28,11 @@ public:
     virtual void insert(T const& value) = 0;
     
     //returns the item at the beginning
-    virtual T const& top() = 0;
+    virtual T& top() = 0;
     //returns the item at the end of the list
-    virtual T const& bottom() = 0;
+    virtual T& bottom() = 0;
     //returns the k-th item of the list; throws it out of range
-    virtual T const& at(unsigned const k) = 0;
+    virtual T& at(unsigned const k) = 0;
     //returns the item ats the top of the list and deletes it
     virtual T pop() = 0;
 

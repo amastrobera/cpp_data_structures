@@ -26,5 +26,8 @@ clean:
 test: #run unit test
 	./$(PROG)
 
+debug:
+	gdb $(PROG)
+
 memory: #test of memory leak
 	valgrind ./$(PROG)

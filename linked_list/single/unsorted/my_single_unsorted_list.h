@@ -27,11 +27,11 @@ public:
     virtual void insert(T const& value);
     
     //returns the item at the beginning
-    virtual T const& top();
+    virtual T& top();
     //returns the item at the end of the list
-    virtual T const& bottom();
+    virtual T& bottom();
     //returns the k-th item of the list; throws it out of range
-    virtual T const& at(unsigned const k);
+    virtual T& at(unsigned const k);
     //returns the item ats the top of the list and deletes it
     virtual T pop();
 
@@ -83,14 +83,14 @@ void SingleUnsortedList<T>::insert(T const& value)
 }
 
 template<typename T> 
-T const& SingleUnsortedList<T>::top()
+T& SingleUnsortedList<T>::top()
 {
     if (this->d_size == 0) throw std::runtime_error("empty list");
     return d_root->value;
 }
 
 template<typename T> 
-T const& SingleUnsortedList<T>::bottom()
+T& SingleUnsortedList<T>::bottom()
 {
     if (this->d_size == 0) throw std::runtime_error("empty list");
     SingleNode<T>* cur = d_root;
@@ -99,7 +99,7 @@ T const& SingleUnsortedList<T>::bottom()
 }
 
 template<typename T> 
-T const& SingleUnsortedList<T>::at(unsigned const k)
+T& SingleUnsortedList<T>::at(unsigned const k)
 {
     if (this->d_size <= k) throw std::runtime_error("out of range");
     SingleNode<T>* cur = d_root;

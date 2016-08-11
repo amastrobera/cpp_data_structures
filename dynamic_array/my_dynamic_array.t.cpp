@@ -12,23 +12,42 @@ void testDynamicArray()
     //init
     std::cout << "    * init" << std::endl;
     DynamicArray<std::string> dyno;
-    dyno.append("ciao");
+    
+    //append
+    std::cout << "    * append" << std::endl;
+    dyno.append("bello");
     assert (1 == dyno.size() && "    >>> failed");
+
+    //push
+    std::cout << "    * push" << std::endl;
+    dyno.push("ciao");
+    assert (2 == dyno.size() && "    >>> failed");
     
     //operator[]
     std::cout << "    * opeator[]" << std::endl;
-    assert ("ciao" == dyno[0] && "    >>> failed");
+    assert ("ciao" == dyno[0] && "    >>> failed[0]");
+    assert ("bello" == dyno[1] && "    >>> failed[1]");
+    
+    //top
+    std::cout << "    * top" << std::endl;
+    assert ("ciao" == dyno.top() && "    >>> failed");
+    
+    //bottom
+    std::cout << "    * bottom" << std::endl;
+    assert ("bello" == dyno.bottom() && "    >>> failed");
 
-//    //next
-//    std::cout << "    * next" << std::endl;
-//    dyno->next = new SingleNode<int>(2);
-//    assert (2 == dyno->next->value && "    >>> failed");
-//    assert (NULL == dyno->next->next && "    >>> failed");
-
-//    //delete
-//    std::cout << "    * delete" << std::endl;
-//    delete dyno->next; dyno->next = NULL;
-//    assert (NULL == dyno->next && "    >>> failed");
+    //pop
+    std::cout << "    * pop" << std::endl;
+    assert ("ciao" == dyno.pop() && "    >>> failed");
+    
+    //removeAt
+    std::cout << "    * removeAt" << std::endl;
+    dyno[0] = "bella";
+    dyno.append("ciao");
+    assert ("bella" == dyno[0] && "    >>> failed[0]");
+    assert ("ciao" == dyno[1] && "    >>> failed[1]");
+    dyno.removeAt(1);
+    assert (1 == dyno.size() && "    >>> failed");
 
     
     std::cout << "OK" << std::endl;
