@@ -16,12 +16,12 @@ C++03, naked pointers, built with Makefile
 * dynamic array (good to implement doubleNode, Stack/Queue)
 * node, single and double 
 * linked_list unordered single (good to implement Stack/Queue)
-* linked_list single
+* linked_list single (sorted)
+* linked_list double (circular, sorted)
 
 
 ### todo ###
-* build script simple
-* linked list double
+* (crap bash) script parsing options from cmd line
 * map (as a normal tree, if possible as a RB tree)
 * build script concurrent
 * iterators for all 

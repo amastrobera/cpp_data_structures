@@ -32,9 +32,12 @@ void testSingleList()
     assert (3 == intList.pop() && "    >>> failed(3)");
     
     //append is useless
-    std::cout << "    * append does nothing" << std::endl;
-    intList.append(8);
-    assert (0 == intList.size() && "    >>> failed size");
+    std::cout << "    * append == insert" << std::endl;
+    intList.append(4);
+    intList.append(2);
+    assert (2 == intList.size() && "    >>> failed size");
+    assert (2 == intList.at(0) && "    >>> failed size");
+    assert (4 == intList.at(1) && "    >>> failed size");
     
     std::cout << "OK" << std::endl;    
 }

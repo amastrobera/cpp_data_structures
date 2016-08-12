@@ -12,7 +12,7 @@
 namespace my_data_structures 
 {
 
-//Double linked list
+//Single, sorted linked list
 template<typename T> 
 class SingleList : public SingleUnsortedList<T>
 {
@@ -21,9 +21,9 @@ public:
 
     virtual ~SingleList() {}
 
-    //adds a value at the bottom of the list
-    virtual void append(T const& value) {}
-    //adds a value at the top of the list
+    //does the same as insert, because this is a sorted list 
+    virtual void append(T const& value) { insert(value); }
+    //adds a value, sorted
     virtual void insert(T const& value);
     
 };
