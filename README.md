@@ -7,6 +7,9 @@ This repo contains my implementations of common data structures for aesthetic pu
 A file for each structure and its unit test. 
 If the implementation includes naked pointers, memory leaks are checked with Valgrind. 
 
+### How to build it  ###
+Use the "build.sh" script from the root directory of this repo. Help available. 
+
 #### Modifying STL libs ####
 * interval map (derived from c++11 std::map)
 
