@@ -7,9 +7,10 @@ MAIN		= my_double_list.t.cpp
 
 LIBS_H		= my_double_list.h
 
-LIBS_CPP	= my_double_list.cpp
+LIBS_CPP	= my_double_list.cpp 
 
 OBJS		= my_double_list.t.o \
+			  my_double_list.o \
 			  $(patsubst %.o,../list/%.o, my_list.o)
 
 CC			= g++

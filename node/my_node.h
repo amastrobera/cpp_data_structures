@@ -32,6 +32,14 @@ struct DoubleNode : public Node<T>
     DoubleNode* right;
 };
 
+template<typename T>
+struct RBNode : public Node<T>
+{
+    RBNode(T const& v): Node<T>(v), left(NULL), right(NULL) {}
+    RBNode* left;
+    RBNode* right;
+    bool checked;
+};
 
 ////need a dynamic array here. todo
 //template<typename T>

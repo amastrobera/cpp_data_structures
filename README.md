@@ -18,10 +18,9 @@ C++03, naked pointers, built with Makefile
 * linked_list unordered single (good to implement Stack/Queue)
 * linked_list single (sorted)
 * linked_list double (circular, sorted)
-
+* tree (rb tree)
 
 ### todo ###
-* (crap bash) script parsing options from cmd line
-* map (as a normal tree, if possible as a RB tree)
-* build script concurrent
+* add functions to the tree 
 * iterators for all 
+* build script concurrent

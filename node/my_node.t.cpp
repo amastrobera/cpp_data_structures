@@ -59,6 +59,41 @@ void testDoubleNode()
     std::cout << "OK" << std::endl;
 }
 
+void testRBNode()
+{
+    using my_data_structures::RBNode;
+    
+    std::cout << "testRBNode ... " << std::endl;
+
+    //init
+    std::cout << "    * init" << std::endl;
+    RBNode<int>* n1 = new RBNode<int>(1);
+    assert (1 == n1->value && "    >>> failed");
+    assert (false == n1->checked && "    >>> failed");
+    assert (NULL == n1->left && "    >>> failed");
+    assert (NULL == n1->right && "    >>> failed");
+
+    //next
+    std::cout << "    * append left" << std::endl;
+    n1->left = new RBNode<int>(2);
+    assert (2 == n1->left->value && "    >>> failed");
+    assert (NULL == n1->left->left && "    >>> failed");
+    assert (NULL == n1->left->right && "    >>> failed");
+    
+    //checked (red->black)
+    std::cout << "    * checked (red->black)" << std::endl;
+    n1->checked = true;
+    assert (true == n1->checked && "    >>> failed");
+ 
+    //delete
+    std::cout << "    * delete" << std::endl;
+    delete n1->left; n1->left = NULL;
+    assert (NULL == n1->left && "    >>> failed");
+    delete n1;
+    
+    std::cout << "OK" << std::endl;    
+}
+
 void testMultiNode()
 {
 //todo
@@ -76,7 +111,9 @@ int main(int argc, char** argv)
     
     testDoubleNode();
     
-    testMultiNode();
+    testRBNode();
+    
+//    testMultiNode();    
     
     return 0;
 }

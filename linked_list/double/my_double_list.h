@@ -6,7 +6,6 @@
 
 #include "my_list.h"
 
-#include <ostream>
 #include <stdexcept>
 
 namespace my_data_structures 
