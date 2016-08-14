@@ -35,10 +35,11 @@ struct DoubleNode : public Node<T>
 template<typename T>
 struct RBNode : public Node<T>
 {
-    RBNode(T const& v): Node<T>(v), left(NULL), right(NULL) {}
+    RBNode(T const& v): Node<T>(v), 
+						left(NULL), right(NULL), red(false) {}
     RBNode* left;
     RBNode* right;
-    bool checked;
+    bool red;
 };
 
 ////need a dynamic array here. todo

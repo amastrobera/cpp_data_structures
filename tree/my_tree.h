@@ -8,10 +8,14 @@
 #include "my_single_unsorted_list.h" //used as a Stack to delete nodes
 #include "my_tree.h"
 
+#include <cstdlib>
 #include <stdexcept>
+#include <utility>
 
 namespace my_data_structures 
 {
+
+unsigned const tree_max_depth_imbalance = 2;
 
 //Double linked list: the last and the first are linked in a circle
 template<typename T> 
@@ -32,7 +36,10 @@ public:
 private:
     unsigned d_size;
     RBNode<T>* d_root;
-    //todo: rebalance()
+
+    unsigned depth(RBNode<T>* node);
+    
+    void rebalance();
 };
 
 
@@ -40,12 +47,12 @@ template<typename T>
 Tree<T>::~Tree()
 {
     SingleUnsortedList< RBNode<T>* > stack;
-    stack.append(d_root);
+    stack.insert(d_root);
     RBNode<T>* cur = stack.pop();
     while (stack.size() || cur)
     {
-        if (cur->left) stack.append(cur->left);
-        if (cur->right) stack.append(cur->right);
+        if (cur->left) stack.insert(cur->left);
+        if (cur->right) stack.insert(cur->right);
         delete cur;
         cur = NULL;
         --this->d_size;
@@ -94,8 +101,48 @@ void Tree<T>::insert(T const& value)
             }
         }
     }
+        
+    if ((unsigned)
+        abs(depth(d_root->left) - depth(d_root->right)) >
+         tree_max_depth_imbalance) 
+    {
+        rebalance();
+    }
 }
 
+template<typename T>
+unsigned Tree<T>::depth(RBNode<T>* node)
+{
+    typedef std::pair< RBNode<T>*, unsigned> PairLevel;
+    unsigned dep = 0;
+    SingleUnsortedList< PairLevel > queue;
+    queue.append( PairLevel(node, 0) );
+    PairLevel cur = queue.pop();
+    while (queue.size() || cur.first)
+    {
+        if (cur.second > dep) 
+            ++dep;
+        if (cur.first->left) 
+            queue.append(PairLevel(cur.first->left, 
+                                    cur.second+1));
+        if (cur.first->right) 
+            queue.append(PairLevel(cur.first->right, 
+                                    cur.second+1));
+
+        if(queue.size())
+            cur = queue.pop();
+        else
+            cur = PairLevel(NULL, 0);
+    }
+    return dep;
+}
+
+
+template<typename T>
+void Tree<T>::rebalance()
+{
+
+}    
 
 
 } //my_data_structures

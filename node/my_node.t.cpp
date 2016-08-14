@@ -69,7 +69,7 @@ void testRBNode()
     std::cout << "    * init" << std::endl;
     RBNode<int>* n1 = new RBNode<int>(1);
     assert (1 == n1->value && "    >>> failed");
-    assert (false == n1->checked && "    >>> failed");
+    assert (false == n1->red && "    >>> failed");
     assert (NULL == n1->left && "    >>> failed");
     assert (NULL == n1->right && "    >>> failed");
 
@@ -82,8 +82,8 @@ void testRBNode()
     
     //checked (red->black)
     std::cout << "    * checked (red->black)" << std::endl;
-    n1->checked = true;
-    assert (true == n1->checked && "    >>> failed");
+    n1->red = true;
+    assert (true == n1->red && "    >>> failed");
  
     //delete
     std::cout << "    * delete" << std::endl;

@@ -10,9 +10,6 @@ If the implementation includes naked pointers, memory leaks are checked with Val
 ### How to build it  ###
 Use the "build.sh" script from the root directory of this repo. Help available. 
 
-#### Modifying STL libs ####
-* interval map (derived from c++11 std::map)
-
 #### Making containiers from scratch  ####
 C++03, naked pointers, built with Makefile
 
@@ -23,7 +20,11 @@ C++03, naked pointers, built with Makefile
 * linked_list double (circular, sorted)
 * tree (rb tree)
 
-### todo ###
+##### todo #####
 * add functions to the tree 
 * iterators for all 
 * build script concurrent
+
+#### Modifying STL libs ####
+* interval map (derived from c++11 std::map)
+

@@ -21,6 +21,12 @@ void testTree()
     intTree.insert(1);
     assert (3 == intTree.size() && "    >>> failed");
 
+    //rebalance
+    std::cout << "    * rebalance" << std::endl;
+    intTree.insert(0);
+    intTree.insert(-1);
+    intTree.insert(-2);
+    assert (6 == intTree.size() && "    >>> failed");
     
     std::cout << "OK" << std::endl;    
 }
