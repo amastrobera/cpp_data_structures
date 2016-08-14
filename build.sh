@@ -24,8 +24,8 @@ makeAllWithOptions()
     cd $build_path/linked_list/double
     make $1
 
-	#make rb tree
-    cd $build_path/tree
+	#make rb tree set
+    cd $build_path/set
     make $1
 
     #finish, come back

@@ -1,35 +1,38 @@
-// Red-Black Tree
+// Red-Black Tree Set
 // not thread safe
 
-#ifndef RB_TREE_LIST_H
-#define RB_TREE_LIST_H
+#ifndef SET_LIST_H
+#define SET_LIST_H
 
 #include "my_node.h"
 #include "my_single_unsorted_list.h" //used as a Stack to delete nodes
-#include "my_tree.h"
+#include "my_set.h"
 
 #include <cstdlib>
+#include <iostream>
 #include <stdexcept>
 #include <utility>
 
 namespace my_data_structures 
 {
 
-unsigned const tree_max_depth_imbalance = 2;
+unsigned const set_max_depth_imbalance = 2;
 
 //Double linked list: the last and the first are linked in a circle
 template<typename T> 
-class Tree
+class Set
 {
 public:
-    Tree() : d_size(0), d_root(NULL) {}
+    Set() : d_size(0), d_root(NULL) {}
 
-    ~Tree();
+    ~Set();
 
     inline unsigned size() { return d_size; }
 
     //adds a value at the top of the list
     void insert(T const& value);
+    
+    std::pair< RBNode<T>*, bool > find(T const& value);
     
     //todo: find, remove, first, last
     
@@ -39,12 +42,16 @@ private:
 
     unsigned depth(RBNode<T>* node);
     
+    unsigned blackDepth(RBNode<T>* node);
+    
+    unsigned blackHeigth();
+    
     void rebalance();
 };
 
 
 template<typename T> 
-Tree<T>::~Tree()
+Set<T>::~Set()
 {
     SingleUnsortedList< RBNode<T>* > stack;
     stack.insert(d_root);
@@ -61,7 +68,7 @@ Tree<T>::~Tree()
 }
 
 template<typename T> 
-void Tree<T>::insert(T const& value)
+void Set<T>::insert(T const& value)
 {
     RBNode<T>* node = new RBNode<T>(value);
     //first node
@@ -76,6 +83,7 @@ void Tree<T>::insert(T const& value)
     bool found = false;
     while (!found)
     {
+        //if key exist already don't insert another one
         if (value == cur->value)
             found = true;
         else if (value > cur->value)
@@ -85,6 +93,7 @@ void Tree<T>::insert(T const& value)
             else
             {
                 cur->right = node;
+                if (!cur->red) node->red = true;
                 ++this->d_size;
                 found = true;
             }
@@ -96,6 +105,7 @@ void Tree<T>::insert(T const& value)
             else
             {
                 cur->left = node;
+                if (!cur->red) node->red = true;
                 ++this->d_size;
                 found = true;
             }
@@ -104,14 +114,90 @@ void Tree<T>::insert(T const& value)
         
     if ((unsigned)
         abs(depth(d_root->left) - depth(d_root->right)) >
-         tree_max_depth_imbalance) 
+         set_max_depth_imbalance) 
     {
         rebalance();
     }
 }
 
+
 template<typename T>
-unsigned Tree<T>::depth(RBNode<T>* node)
+std::pair< RBNode<T>*, bool > Set<T>::find(T const& value)
+{
+    //if empty list, return null
+    if (!d_root)
+        return std::pair< RBNode<T>*, bool >(NULL, false);
+    
+    //binary search, return false if nothing found
+    RBNode<T>* cur = d_root;
+    while (cur)
+    {
+        if (cur->value == value)
+            return std::pair< RBNode<T>*, bool >(cur, true);
+        else if (value < cur->value)
+            cur = (cur->left) ? cur->left: NULL;
+        else
+            cur = (cur->right) ? cur->right: NULL;
+    }
+    return std::pair< RBNode<T>*, bool >(NULL, false);
+}
+
+
+template<typename T>
+unsigned Set<T>::blackDepth(RBNode<T>* node)
+{
+    //count the number of black nodes from the root to node
+    unsigned dep = 0;
+    SingleUnsortedList< RBNode<T>* > queue;
+    queue.append(d_root);
+    RBNode<T>* cur = queue.pop();
+    while (queue.size() || cur)
+    {
+        //count number of black nodes 
+        if (!cur) ++dep;
+        if (cur == node) break; //exit when you the running ptr finds node
+        
+        //append the next nodes to the queue\, if any
+        if (cur->left) queue.append(cur->left);
+        if (cur->right) queue.append(cur->right);
+
+        //update the running ptr
+        if(queue.size())
+            cur = queue.pop();
+        else
+            cur = NULL;
+    }
+    return dep;
+}
+    
+template<typename T>
+unsigned Set<T>::blackHeigth()
+{
+    //count the number of black nodes from the root to node
+    unsigned dep = 0;
+    SingleUnsortedList< RBNode<T>* > queue;
+    queue.append(d_root);
+    RBNode<T>* cur = queue.pop();
+    while (queue.size() || cur)
+    {
+        //count number of black nodes 
+        if (!cur) ++dep;
+        
+        //append the next nodes to the queue\, if any
+        if (cur->left) queue.append(cur->left);
+        if (cur->right) queue.append(cur->right);
+
+        //update the running ptr
+        if(queue.size())
+            cur = queue.pop();
+        else
+            cur = NULL;
+    }
+    return dep;
+}
+
+template<typename T>
+unsigned Set<T>::depth(RBNode<T>* node)
 {
     typedef std::pair< RBNode<T>*, unsigned> PairLevel;
     unsigned dep = 0;
@@ -139,9 +225,9 @@ unsigned Tree<T>::depth(RBNode<T>* node)
 
 
 template<typename T>
-void Tree<T>::rebalance()
+void Set<T>::rebalance()
 {
-
+    std::cout << "rebalancing " << std::endl;
 }    
 
 

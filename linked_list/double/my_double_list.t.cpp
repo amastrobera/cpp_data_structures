@@ -6,6 +6,7 @@
 void testDoubleList()
 {
     using my_data_structures::DoubleList;
+    using my_data_structures::DoubleNode;
     
     std::cout << "testDoubleList ... " << std::endl;
 
@@ -47,15 +48,29 @@ void testDoubleList()
     assert (1 == intList.size() && "    >>> failed");
     assert (2 == intList.pop() && "    >>> failed");
     assert (0 == intList.size() && "    >>> failed");
-    
-    //remove
-    std::cout << "    * remove " << std::endl;
+ 
+ 
+    //find
+    std::cout << "    * find " << std::endl;
     intList.insert(2);
     intList.insert(0);
     intList.insert(3);
     intList.insert(0);
     intList.insert(0);
-    intList.insert(1);    
+    intList.insert(1);
+    std::pair< DoubleNode<int>*, bool > found = intList.find(2);
+    assert (true == found.second && "    >>> failed found(2)");
+    assert (2 == found.first->value && "    >>> failed found(2)");
+    assert (3 == found.first->right->value && "    >>> failed found(2)");
+    assert (1 == found.first->left->value && "    >>> failed found(2)");
+
+    std::pair< DoubleNode<int>*, bool > notFound = intList.find(4);
+    assert (false == notFound.second && "    >>> failed not found(4)");
+    assert (NULL == notFound.first && "    >>> failed not found(4)");
+
+    
+    //remove
+    std::cout << "    * remove " << std::endl;
     assert (6 == intList.size() && "    >>> failed");
     assert (1 == intList.at(3) && "    >>> failed");
     intList.remove(1);

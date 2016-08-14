@@ -1,16 +1,16 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_tree
+PROG		= test_set
 
-MAIN		= my_tree.t.cpp
+MAIN		= my_set.t.cpp
 
-LIBS_H		= my_tree.h
+LIBS_H		= my_set.h
 
-LIBS_CPP	= my_tree.cpp 
+LIBS_CPP	= my_set.cpp 
 
-OBJS		= my_tree.t.o \
-			  my_tree.o \
+OBJS		= my_set.t.o \
+			  my_set.o \
               $(patsubst %.o,../linked_list/single/unsorted/%.o, \
 			  my_single_unsorted_list.o)
 

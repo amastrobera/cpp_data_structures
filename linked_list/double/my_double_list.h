@@ -7,6 +7,7 @@
 #include "my_list.h"
 
 #include <stdexcept>
+#include <utility>
 
 namespace my_data_structures 
 {
@@ -33,6 +34,10 @@ public:
     virtual T& at(unsigned const k);
     //returns the item ats the top of the list and deletes it
     virtual T pop();
+    
+    //returns pointer/found of the node with the value = value
+    //deleting the returned pointer will compromise the who class structure
+    std::pair< DoubleNode<T>*, bool > find(T const& value);
 
     //deletes the first occurrence of a given value
     virtual void remove(T const& value);
@@ -160,6 +165,28 @@ T DoubleList<T>::pop()
     return val;
 }
 
+template<typename T>
+std::pair< DoubleNode<T>*, bool > DoubleList<T>::find(T const& value)
+{
+    //if empty list, return null
+    if (!d_root)
+        return std::pair< DoubleNode<T>*, bool >(NULL, false);
+    
+    //if it is the root, return it
+    if (d_root->value == value)
+        return std::pair< DoubleNode<T>*, bool >(d_root, true);
+
+    //otherwise loop through the who list until you find the value
+    //if you hit the root again, the value is not in the list
+    DoubleNode<T>* cur = d_root->right;
+    while (cur != d_root && cur->value < value) cur = cur->right;
+    
+    if (cur->value == value)
+        return std::pair< DoubleNode<T>*, bool >(cur, true);
+    else
+        return std::pair< DoubleNode<T>*, bool >(NULL, false);
+}
+    
 
 template<typename T> 
 void DoubleList<T>::remove(T const& value)

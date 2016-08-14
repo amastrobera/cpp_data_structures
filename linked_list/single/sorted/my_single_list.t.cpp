@@ -6,6 +6,7 @@
 void testSingleList()
 {
     using my_data_structures::SingleList;
+    using my_data_structures::SingleNode;
     
     std::cout << "testSingleList ... " << std::endl;
 
@@ -31,7 +32,7 @@ void testSingleList()
     assert (2 == intList.pop() && "    >>> failed(2)");
     assert (3 == intList.pop() && "    >>> failed(3)");
     
-    //append is useless
+    //append == insert (because the list is sorted)
     std::cout << "    * append == insert" << std::endl;
     intList.append(4);
     intList.append(2);
@@ -39,7 +40,19 @@ void testSingleList()
     assert (2 == intList.at(0) && "    >>> failed size");
     assert (4 == intList.at(1) && "    >>> failed size");
     
-    std::cout << "OK" << std::endl;    
+    //find
+    std::cout << "    * find " << std::endl;
+    intList.insert(1);
+    intList.insert(3);
+    std::pair< SingleNode<int>*, bool > found = intList.find(3);
+    assert (true == found.second && "    >>> failed found(3)");
+    assert (3 == found.first->value && "    >>> failed found(3)");
+    assert (4 == found.first->next->value && "    >>> failed found(4)");
+
+    std::pair< SingleNode<int>*, bool > notFound = intList.find(5);
+    assert (false == notFound.second && "    >>> failed not found(5)");
+    assert (NULL == notFound.first && "    >>> failed not found(5)");
+    
 }
 
 
