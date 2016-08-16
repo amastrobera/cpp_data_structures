@@ -5,10 +5,10 @@
 #define SET_LIST_H
 
 #include "my_node.h"
-#include "my_single_unsorted_list.h" //used as a Stack to delete nodes
+#include "my_single_unsorted_list.h" //used as a Stack/Queue for DFS or BFS
 #include "my_set.h"
 
-#include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
@@ -34,19 +34,56 @@ public:
     
     std::pair< RBNode<T>*, bool > find(T const& value);
     
-    //todo: find, remove, first, last
+    //todo: return a proper iterator, once the iterator class is ready
+    RBNode<T>* first();
+    
+    RBNode<T>* last();
+
+    //todo: remove function
+    
+    //temporary test functions, make friend to private test methods
+    void print();
+    bool isBalanced() { return (d_size <= 3 ) ? true : 
+            std::abs(depth(d_root->left) - depth(d_root->right)) < 2;
+                        }
     
 private:
     unsigned d_size;
+    
     RBNode<T>* d_root;
 
+    //todo: what to do with those measures ?
+    //max number of levels from node, downwards
     unsigned depth(RBNode<T>* node);
-    
+    //number of black nodes from root to node
     unsigned blackDepth(RBNode<T>* node);
-    
+    //number of black nodes in the tree
     unsigned blackHeigth();
     
-    void rebalance();
+    //rebalancing function for insertion
+    void insertRebalance(RBNode<T>*& greatGrandParentNode,
+                         RBNode<T>*& grandParentNode, 
+                         RBNode<T>* parentNode, 
+                         RBNode<T>* uncleNode, 
+                         RBNode<T>* childNode);
+
+    unsigned insertRebalanceCase(RBNode<T>* grandParentNode,
+                                 RBNode<T>* parentNode, 
+                                 RBNode<T>* uncleNode, 
+                                 RBNode<T>* childNode) const;
+
+    void recolourNodes(RBNode<T>*& grandParentNode);
+
+    void leftStraigthLine(RBNode<T>*& grandParentNode);
+    
+    void rightStraigthLine(RBNode<T>*& grandParentNode);
+    
+    void leftRotate(RBNode<T>*& greatGrandParentNode, 
+                    RBNode<T>*& grandParentNode);
+   
+    void rightRotate(RBNode<T>*& greatGrandParentNode, 
+                     RBNode<T>*& grandParentNode);
+                     
 };
 
 
@@ -62,7 +99,7 @@ Set<T>::~Set()
         if (cur->right) stack.insert(cur->right);
         delete cur;
         cur = NULL;
-        --this->d_size;
+        --d_size;
         if(stack.size()) cur = stack.pop();
     }
 }
@@ -71,54 +108,238 @@ template<typename T>
 void Set<T>::insert(T const& value)
 {
     RBNode<T>* node = new RBNode<T>(value);
+
     //first node
     if (!d_root) 
     {
         d_root = node;
-        ++this->d_size;
+        ++d_size;
         return;
     }
+
     //second+ node: find the append point by comparing (ASC) existing nodes
-    RBNode<T>* cur = d_root;
+    RBNode<T>* greatGrandParentNode = NULL;
+    RBNode<T>* grandParentNode = NULL;
+    RBNode<T>* parentNode = d_root;
+    RBNode<T>* uncleNode = NULL;
     bool found = false;
     while (!found)
     {
-        //if key exist already don't insert another one
-        if (value == cur->value)
-            found = true;
-        else if (value > cur->value)
+        if (value == parentNode->value)
         {
-            if (cur->right)
-                cur = cur->right;
+            //if key exist already don't insert another one
+            return;
+        }
+        else if (value > parentNode->value)
+        { //to the right
+            if (parentNode->right)
+            { // move fwd
+                greatGrandParentNode = grandParentNode;
+                grandParentNode = parentNode;
+                uncleNode = parentNode->left;
+                parentNode = parentNode->right;
+            }
             else
-            {
-                cur->right = node;
-                if (!cur->red) node->red = true;
-                ++this->d_size;
+            { // add node to the right side and rebalance
+                node->red = true;
+                parentNode->right = node;
+                ++d_size;
+                insertRebalance(greatGrandParentNode,
+                                grandParentNode, 
+                                parentNode, 
+                                uncleNode, 
+                                parentNode->right);
                 found = true;
             }
         }
         else
-        {
-            if (cur->left)
-                cur = cur->left;
+        { //to the left 
+            if (parentNode->left)
+            { // move fwd
+                greatGrandParentNode = grandParentNode;
+                grandParentNode = parentNode;
+                uncleNode = parentNode->right;
+                parentNode = parentNode->left;
+            }
             else
-            {
-                cur->left = node;
-                if (!cur->red) node->red = true;
-                ++this->d_size;
+            { //add node on the left side and rebalance
+                node->red = true;
+                parentNode->left = node;
+                ++d_size;
+                insertRebalance(greatGrandParentNode, 
+                                grandParentNode, 
+                                parentNode, 
+                                uncleNode, 
+                                parentNode->left);
                 found = true;
             }
         }
     }
-        
-    if ((unsigned)
-        abs(depth(d_root->left) - depth(d_root->right)) >
-         set_max_depth_imbalance) 
-    {
-        rebalance();
-    }
 }
+
+template<typename T>
+void Set<T>::insertRebalance(RBNode<T>*& greatGrandParentNode,
+                             RBNode<T>*& grandParentNode,
+                             RBNode<T>* parentNode,
+                             RBNode<T>* uncleNode,
+                             RBNode<T>* childNode)
+{
+    switch (insertRebalanceCase(grandParentNode, 
+                                  parentNode, 
+                                  uncleNode, 
+                                  childNode))
+    {
+        case 0: //nothing to rebalance
+            break;
+
+        case 1: //colour nodes
+            recolourNodes(grandParentNode);
+            break;
+
+        case 2: //make it a case 3 and manage it
+            if (parentNode == grandParentNode->left &&
+                            childNode == parentNode->right)
+                leftStraigthLine(grandParentNode);
+            else
+                rightStraigthLine(grandParentNode);
+            //fallthrough case 3
+            
+        case 3: //rotate
+            if (parentNode == grandParentNode->left &&
+                            childNode == parentNode->left)
+                rightRotate(greatGrandParentNode, 
+                            grandParentNode);
+            else
+                leftRotate(greatGrandParentNode, 
+                           grandParentNode);
+            break;
+    }
+}    
+
+template<typename T>
+unsigned Set<T>::insertRebalanceCase(RBNode<T>* grandParentNode,
+                                     RBNode<T>* parentNode,
+                                     RBNode<T>* uncleNode,
+                                     RBNode<T>* childNode) const
+{
+    if (grandParentNode && !grandParentNode->red)
+    {
+        if ((uncleNode && uncleNode->red) && 
+                parentNode->red && childNode->red)
+        {
+            return 1;
+        }
+        else if ((!uncleNode || !uncleNode->red) && 
+                                parentNode->red && childNode->red &&
+                 ((parentNode == grandParentNode->left &&
+                                childNode == parentNode->right) ||
+                  (parentNode == grandParentNode->right &&
+                                childNode == parentNode->left)) )
+        {
+            return 2;
+        }
+        else if ((parentNode->red && childNode->red) &&
+                 ((parentNode == grandParentNode->left &&
+                                childNode == parentNode->left) ||
+                  (parentNode == grandParentNode->right &&
+                                childNode == parentNode->right)))
+        {
+            return 3;
+        }
+    }
+
+    return 0;
+}
+
+
+template<typename T>
+void Set<T>::recolourNodes(RBNode<T>*& grandParentNode)
+{
+    //set parent and uncle nodes black, grandparent red
+    if (grandParentNode->left) grandParentNode->left->red = false;
+    if (grandParentNode->right) grandParentNode->right->red = false;
+    if (grandParentNode != d_root) grandParentNode->red = true;
+}
+
+template<typename T>
+void Set<T>::leftStraigthLine(RBNode<T>*& grandParentNode)
+{
+    //make a straight line to the left
+    RBNode<T>* parentNode = grandParentNode->left;
+    RBNode<T>* childNode = grandParentNode->left->right;
+    grandParentNode->left = childNode;
+    childNode->left = parentNode;
+    parentNode->right = NULL;
+    
+    //swap parent and child
+    RBNode<T>* temp;
+    temp = parentNode;
+    parentNode = childNode;
+    childNode = temp;
+}
+
+template<typename T>
+void Set<T>::rightStraigthLine(RBNode<T>*& grandParentNode)
+{
+    //make a straight line to the right
+    RBNode<T>* parentNode = grandParentNode->right;
+    RBNode<T>* childNode = grandParentNode->right->left;
+    grandParentNode->right = childNode;
+    childNode->right = parentNode;
+    parentNode->left = NULL;
+    
+    //swap parent and child
+    RBNode<T>* temp;
+    temp = parentNode;
+    parentNode = childNode;
+    childNode = temp;
+}
+
+
+template<typename T>
+void Set<T>::leftRotate(RBNode<T>*& greatGrandParentNode, 
+                        RBNode<T>*& grandParentNode)
+{
+    //rotation
+    RBNode<T>* parentNode = grandParentNode->right;
+    grandParentNode->right = parentNode->left;
+    parentNode->left = grandParentNode;
+    //swap
+    grandParentNode = parentNode;
+    //colour change
+    grandParentNode->red = false;
+    grandParentNode->left->red = grandParentNode->right->red = true;
+    if (grandParentNode->left->left) 
+        grandParentNode->left->left->red = false;
+    //attach new node to the original tree
+    if (greatGrandParentNode)
+        greatGrandParentNode->right = grandParentNode;
+    else if (d_size == 3)
+        d_root = grandParentNode;
+}
+
+template<typename T>
+void Set<T>::rightRotate(RBNode<T>*& greatGrandParentNode, 
+                         RBNode<T>*& grandParentNode)
+{
+    //rotation
+    RBNode<T>* parentNode = grandParentNode->left;
+    grandParentNode->left = parentNode->right;
+    parentNode->right = grandParentNode;
+    //swap
+    grandParentNode = parentNode;
+    //colour change
+    grandParentNode->red = false;
+    grandParentNode->left->red = grandParentNode->right->red = true;
+    if (grandParentNode->right->right)
+        grandParentNode->right->right->red = false;
+    //attach new node to the original tree
+    if (greatGrandParentNode)
+        greatGrandParentNode->left = grandParentNode;
+    else if (d_size == 3)
+        d_root = grandParentNode;
+}
+
 
 
 template<typename T>
@@ -142,6 +363,22 @@ std::pair< RBNode<T>*, bool > Set<T>::find(T const& value)
     return std::pair< RBNode<T>*, bool >(NULL, false);
 }
 
+template<typename T>
+RBNode<T>* Set<T>::first()
+{
+    RBNode<T>* cur = d_root;
+    while (cur->left) cur = cur->left;
+    return cur;
+}
+
+template<typename T>
+RBNode<T>* Set<T>::last()
+{
+    RBNode<T>* cur = d_root;
+    while (cur->right) cur = cur->right;
+    return cur;
+}
+
 
 template<typename T>
 unsigned Set<T>::blackDepth(RBNode<T>* node)
@@ -154,7 +391,7 @@ unsigned Set<T>::blackDepth(RBNode<T>* node)
     while (queue.size() || cur)
     {
         //count number of black nodes 
-        if (!cur) ++dep;
+        if (!cur->red) ++dep;
         if (cur == node) break; //exit when you the running ptr finds node
         
         //append the next nodes to the queue\, if any
@@ -181,7 +418,7 @@ unsigned Set<T>::blackHeigth()
     while (queue.size() || cur)
     {
         //count number of black nodes 
-        if (!cur) ++dep;
+        if (!cur->red) ++dep;
         
         //append the next nodes to the queue\, if any
         if (cur->left) queue.append(cur->left);
@@ -225,10 +462,43 @@ unsigned Set<T>::depth(RBNode<T>* node)
 
 
 template<typename T>
-void Set<T>::rebalance()
+void Set<T>::print()
 {
-    std::cout << "rebalancing " << std::endl;
-}    
+    SingleUnsortedList< std::pair<RBNode<T>* , unsigned> > queue;
+    std::pair<RBNode<T>* , unsigned> cur(d_root, 0);
+    unsigned level = 0;
+    while (queue.size() || cur.first)
+    {
+        if (level < cur.second)
+        {
+            std::cout << std::endl;
+            ++level;
+        }
+        std::cout << cur.first->value
+                  << "(" << ( (cur.first->red)? "r":"b") << ")";
+        if (cur.first->left && cur.first->right)
+            std::cout << "(2)" ;
+        else if ((cur.first->left && !cur.first->right) ||
+                 (!cur.first->left && cur.first->right))
+            std::cout << "(1)" ;
+        else
+            std::cout << "(0)" ;
+        std::cout << "  ";
+
+        if (cur.first->left)
+            queue.append(std::pair<RBNode<T>* , unsigned>
+                            (cur.first->left, level+1));
+        if (cur.first->right)
+            queue.append(std::pair<RBNode<T>* , unsigned>
+                            (cur.first->right, level+1));
+
+        if (queue.size() > 0)
+            cur = queue.pop();
+        else
+            cur = std::pair<RBNode<T>* , unsigned>(NULL, 0);
+    }
+    std::cout << std::endl;
+}
 
 
 } //my_data_structures
