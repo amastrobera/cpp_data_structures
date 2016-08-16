@@ -13,13 +13,13 @@ Use the "build.sh" script from the root directory of this repo. Help available.
 #### Making containiers from scratch  ####
 C++03, naked pointers, built with Makefile
 
-* dynamic array (good to implement doubleNode, Stack/Queue)
-* node, single and double 
-* linked_list unordered single (good to implement Stack/Queue)
+* node, single and RB node
+* vector (dynamic array, can implement Stack/Queue)
+* linked_list unordered single (can implement Stack/Queue)
 * linked_list single (sorted)
 * linked_list double (circular, sorted)
-* set (rb tree)
-* map (rb tree)
+* set (RB tree)
+* map (RB tree)
 
 ##### todo #####
 * bug on RB insert algorithm, wrong source 
