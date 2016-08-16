@@ -1,17 +1,17 @@
-#include "my_dynamic_array.h"
+#include "my_vector.h"
 
 #include <cassert>
 #include <iostream>
  
-void testDynamicArray()
+void testVector()
 {
-    using my_data_structures::DynamicArray;
+    using my_data_structures::Vector;
     
-    std::cout << "testDynamicArray ... " << std::endl;
+    std::cout << "testVector ... " << std::endl;
 
     //init
     std::cout << "    * init" << std::endl;
-    DynamicArray<std::string> dyno;
+    Vector<std::string> dyno;
     
     //append
     std::cout << "    * append" << std::endl;
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 
 
 {
-    testDynamicArray();
+    testVector();
         
     return 0;
 }

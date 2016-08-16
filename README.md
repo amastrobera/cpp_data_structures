@@ -19,9 +19,11 @@ C++03, naked pointers, built with Makefile
 * linked_list single (sorted)
 * linked_list double (circular, sorted)
 * set (rb tree)
+* map (rb tree)
 
 ##### todo #####
-* add functions to the tree (rebalane rbtree, delete)
+* bug on RB insert algorithm, wrong source 
+* add function delete to set and map
 * iterators for all 
 * build script concurrent
 

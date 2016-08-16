@@ -1,12 +1,12 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_my_dynamic_array
+PROG		= test_my_vector
 
-MAIN		= my_dynamic_array.t.cpp
-LIBS_H		= my_dynamic_array.h
-LIBS_CPP	= my_dynamic_array.cpp
-OBJS		= my_dynamic_array.o my_dynamic_array.t.o
+MAIN		= my_vector.t.cpp
+LIBS_H		= my_vector.h
+LIBS_CPP	= my_vector.cpp
+OBJS		= my_vector.o my_vector.t.o
 
 CC			= g++
 CPPFLAGS	= -g -Wall -I.

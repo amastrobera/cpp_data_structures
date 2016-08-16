@@ -1,12 +1,12 @@
-// dynamic array
+// vector (dynamic array)
 // not thread safe yet
 
 #ifndef NULL_H
 #define NULL 0
 #endif
 
-#ifndef DYNAMIC_ARRAY_H
-#define DYNAMIC_ARRAY_H
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #include <stdexcept>
 
@@ -17,12 +17,12 @@ unsigned const dynamic_array_default_size = 100;
 double const dynamic_array_upsize_factor = 1.6;
 
 template<typename T>
-class DynamicArray
+class Vector
 {
 public:
-    DynamicArray(unsigned size=dynamic_array_default_size); 
+    Vector(unsigned size=dynamic_array_default_size); 
 
-    ~DynamicArray();
+    ~Vector();
 
     inline unsigned size() const { return d_num; }
 
@@ -51,14 +51,14 @@ private:
 
 
 template<typename T>
-DynamicArray<T>::DynamicArray(unsigned size) : d_size(size), d_num(0) 
+Vector<T>::Vector(unsigned size) : d_size(size), d_num(0) 
 {
     d_array = new T[d_size];
 }
 
 
 template<typename T>
-DynamicArray<T>::~DynamicArray()
+Vector<T>::~Vector()
 {
     delete[] d_array;
     d_size = 0;
@@ -66,7 +66,7 @@ DynamicArray<T>::~DynamicArray()
 }
 
 template<typename T>
-void DynamicArray<T>::append(T const& value)
+void Vector<T>::append(T const& value)
 {
     if (d_num == d_size) upSize();
     d_array[d_num++] = value;
@@ -74,7 +74,7 @@ void DynamicArray<T>::append(T const& value)
 
 
 template<typename T>
-void DynamicArray<T>::push(T const& value)
+void Vector<T>::push(T const& value)
 {
     if (d_num == d_size) upSize();
     for (unsigned i = d_num; i > 0; --i)
@@ -86,28 +86,28 @@ void DynamicArray<T>::push(T const& value)
 }
 
 template<typename T>
-T& DynamicArray<T>::top()
+T& Vector<T>::top()
 {
     if (d_num == 0) throw std::runtime_error("empty array, no top");
     return d_array[0];
 }
 
 template<typename T>
-T& DynamicArray<T>::bottom()
+T& Vector<T>::bottom()
 {
     if (d_num == 0) throw std::runtime_error("empty array, no bottom");
     return d_array[d_num-1];
 }
 
 template<typename T>
-T& DynamicArray<T>::operator[](unsigned const k)
+T& Vector<T>::operator[](unsigned const k)
 {
     if (k >= d_num) throw std::runtime_error("not value for this index");
     return d_array[k];
 }
 
 template<typename T>    
-T DynamicArray<T>::pop()
+T Vector<T>::pop()
 {
     T tgt = d_array[0];
     for (unsigned i = 1; i < d_num; ++i)
@@ -119,7 +119,7 @@ T DynamicArray<T>::pop()
 }
 
 template<typename T>        
-void DynamicArray<T>::removeAt(unsigned const k)
+void Vector<T>::removeAt(unsigned const k)
 {
     if (k >= d_num) throw std::runtime_error("not value for this index");
     if (k == d_num)
@@ -133,7 +133,7 @@ void DynamicArray<T>::removeAt(unsigned const k)
 
 
 template<typename T>
-void DynamicArray<T>::upSize()
+void Vector<T>::upSize()
 {
     //copy items into a new array
     unsigned newSize = (unsigned int) dynamic_array_upsize_factor * d_size;

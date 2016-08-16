@@ -1,13 +1,14 @@
-// Red-Black Tree Set
+// Red-Black Tree Map
 // not thread safe
 
-#ifndef SET_H
-#define SET_H
+#ifndef MAP_H
+#define MAP_H
 
 #include "my_node.h"
 #include "my_single_unsorted_list.h" //used as a Stack/Queue for DFS or BFS
 
 #include <cmath>
+#include <limits>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
@@ -15,28 +16,35 @@
 namespace my_data_structures 
 {
 
-unsigned const set_max_depth_imbalance = 2;
+unsigned const map_max_depth_imbalance = 2;
 
 //Double linked list: the last and the first are linked in a circle
-template<typename T> 
-class Set
+template<typename K, typename V>
+class Map
 {
 public:
-    Set() : d_size(0), d_root(NULL) {}
+    Map() : d_size(0), d_root(NULL) {}
 
-    ~Set();
+    ~Map();
 
     inline unsigned size() { return d_size; }
 
-    //inserts into the tree, sorted and rebalanced properly 
-    void insert(T const& value);
+    //inserts a value in the tree given key, sorts and rebalances tree
+    std::pair< RBNode< std::pair<K,V> >*, bool> insert(
+                    std::pair<K, V> const& key);
     
-    std::pair< RBNode<T>*, bool > find(T const& value);
+    //returns the item corresponding to key, or it inserts it and returns it
+    V& operator[](K const& key);
+    
+    //returns the item corresponding to key, or throws 
+    V& at(K const& key);
+    
+    std::pair< RBNode< std::pair<K,V> >*, bool> find(K const& key);
     
     //todo: return a proper iterator, once the iterator class is ready
-    RBNode<T>* first();
+    RBNode< std::pair<K,V> >* first();
     
-    RBNode<T>* last();
+    RBNode< std::pair<K,V> >* last();
 
     //todo: remove function
     
@@ -49,49 +57,58 @@ public:
 private:
     unsigned d_size;
     
-    RBNode<T>* d_root;
+    RBNode< std::pair<K,V> >* d_root;
 
     //todo: what to do with those measures ?
     //max number of levels from node, downwards
-    unsigned depth(RBNode<T>* node);
+    unsigned depth(
+                    RBNode< std::pair<K,V> >* node);
     //number of black nodes from root to node
-    unsigned blackDepth(RBNode<T>* node);
+    unsigned blackDepth(
+                    RBNode< std::pair<K,V> >* node);
     //number of black nodes in the tree
     unsigned blackHeigth();
     
     //rebalancing function for insertion
-    void insertRebalance(RBNode<T>*& greatGrandParentNode,
-                         RBNode<T>*& grandParentNode, 
-                         RBNode<T>* parentNode, 
-                         RBNode<T>* uncleNode, 
-                         RBNode<T>* childNode);
+    void insertRebalance(
+                    RBNode< std::pair<K,V> >*& greatGrandParentNode,
+                    RBNode< std::pair<K,V> >*& grandParentNode, 
+                    RBNode< std::pair<K,V> >* parentNode, 
+                    RBNode< std::pair<K,V> >* uncleNode, 
+                    RBNode< std::pair<K,V> >* childNode);
 
-    unsigned insertRebalanceCase(RBNode<T>* grandParentNode,
-                                 RBNode<T>* parentNode, 
-                                 RBNode<T>* uncleNode, 
-                                 RBNode<T>* childNode) const;
+    unsigned insertRebalanceCase(
+                    RBNode< std::pair<K,V> >* grandParentNode,
+                    RBNode< std::pair<K,V> >* parentNode, 
+                    RBNode< std::pair<K,V> >* uncleNode, 
+                    RBNode< std::pair<K,V> >* childNode) const;
 
-    void recolourNodes(RBNode<T>*& grandParentNode);
+    void recolourNodes(
+                    RBNode< std::pair<K,V> >*& grandParentNode);
 
-    void leftStraigthLine(RBNode<T>*& grandParentNode);
+    void leftStraigthLine(
+                    RBNode< std::pair<K,V> >*& grandParentNode);
     
-    void rightStraigthLine(RBNode<T>*& grandParentNode);
+    void rightStraigthLine(
+                    RBNode< std::pair<K,V> >*& grandParentNode);
     
-    void leftRotate(RBNode<T>*& greatGrandParentNode, 
-                    RBNode<T>*& grandParentNode);
+    void leftRotate(
+                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
+                    RBNode< std::pair<K,V> >*& grandParentNode);
    
-    void rightRotate(RBNode<T>*& greatGrandParentNode, 
-                     RBNode<T>*& grandParentNode);
+    void rightRotate(
+                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
+                    RBNode< std::pair<K,V> >*& grandParentNode);
                      
 };
 
 
-template<typename T> 
-Set<T>::~Set()
+template<typename K, typename V> 
+Map<K,V>::~Map()
 {
-    SingleUnsortedList< RBNode<T>* > stack;
+    SingleUnsortedList< RBNode< std::pair<K,V> >* > stack;
     stack.insert(d_root);
-    RBNode<T>* cur = stack.pop();
+    RBNode< std::pair<K,V> >* cur = stack.pop();
     while (stack.size() || cur)
     {
         if (cur->left) stack.insert(cur->left);
@@ -103,33 +120,34 @@ Set<T>::~Set()
     }
 }
 
-template<typename T> 
-void Set<T>::insert(T const& value)
+template<typename K, typename V> 
+std::pair< RBNode< std::pair<K,V> >*, bool> Map<K,V>::insert(
+                    std::pair<K, V> const& value)
 {
-    RBNode<T>* node = new RBNode<T>(value);
+    RBNode< std::pair<K,V> >* node = new RBNode< std::pair<K,V> >(value);
 
     //first node
     if (!d_root) 
     {
         d_root = node;
         ++d_size;
-        return;
+        return std::pair< RBNode< std::pair<K,V> >*, bool>(NULL, false);
     }
 
     //second+ node: find the append point by comparing (ASC) existing nodes
-    RBNode<T>* greatGrandParentNode = NULL;
-    RBNode<T>* grandParentNode = NULL;
-    RBNode<T>* parentNode = d_root;
-    RBNode<T>* uncleNode = NULL;
+    RBNode< std::pair<K,V> >* greatGrandParentNode = NULL;
+    RBNode< std::pair<K,V> >* grandParentNode = NULL;
+    RBNode< std::pair<K,V> >* parentNode = d_root;
+    RBNode< std::pair<K,V> >* uncleNode = NULL;
     bool found = false;
     while (!found)
     {
-        if (value == parentNode->value)
+        if (value.first == parentNode->value.first)
         {
             //if key exist already don't insert another one
-            return;
+            return std::pair< RBNode< std::pair<K,V> >*, bool>(NULL, false);
         }
-        else if (value > parentNode->value)
+        else if (value.first > parentNode->value.first)
         { //to the right
             if (parentNode->right)
             { // move fwd
@@ -174,14 +192,17 @@ void Set<T>::insert(T const& value)
             }
         }
     }
+    
+    return std::pair< RBNode< std::pair<K,V> >*, bool>(NULL, false);
 }
 
-template<typename T>
-void Set<T>::insertRebalance(RBNode<T>*& greatGrandParentNode,
-                             RBNode<T>*& grandParentNode,
-                             RBNode<T>* parentNode,
-                             RBNode<T>* uncleNode,
-                             RBNode<T>* childNode)
+template<typename K, typename V>
+void Map<K,V>::insertRebalance(
+                    RBNode< std::pair<K,V> >*& greatGrandParentNode,
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >* parentNode,
+                    RBNode< std::pair<K,V> >* uncleNode,
+                    RBNode< std::pair<K,V> >* childNode)
 {
     switch (insertRebalanceCase(grandParentNode, 
                                   parentNode, 
@@ -215,11 +236,12 @@ void Set<T>::insertRebalance(RBNode<T>*& greatGrandParentNode,
     }
 }    
 
-template<typename T>
-unsigned Set<T>::insertRebalanceCase(RBNode<T>* grandParentNode,
-                                     RBNode<T>* parentNode,
-                                     RBNode<T>* uncleNode,
-                                     RBNode<T>* childNode) const
+template<typename K, typename V>
+unsigned Map<K,V>::insertRebalanceCase(
+                        RBNode< std::pair<K,V> >* grandParentNode,
+                        RBNode< std::pair<K,V> >* parentNode,
+                        RBNode< std::pair<K,V> >* uncleNode,
+                        RBNode< std::pair<K,V> >* childNode) const
 {
     if (grandParentNode && !grandParentNode->red)
     {
@@ -251,8 +273,9 @@ unsigned Set<T>::insertRebalanceCase(RBNode<T>* grandParentNode,
 }
 
 
-template<typename T>
-void Set<T>::recolourNodes(RBNode<T>*& grandParentNode)
+template<typename K, typename V>
+void Map<K,V>::recolourNodes(
+                    RBNode< std::pair<K,V> >*& grandParentNode)
 {
     //set parent and uncle nodes black, grandparent red
     if (grandParentNode->left) grandParentNode->left->red = false;
@@ -260,47 +283,50 @@ void Set<T>::recolourNodes(RBNode<T>*& grandParentNode)
     if (grandParentNode != d_root) grandParentNode->red = true;
 }
 
-template<typename T>
-void Set<T>::leftStraigthLine(RBNode<T>*& grandParentNode)
+template<typename K, typename V>
+void Map<K,V>::leftStraigthLine(
+                    RBNode< std::pair<K,V> >*& grandParentNode)
 {
     //make a straight line to the left
-    RBNode<T>* parentNode = grandParentNode->left;
-    RBNode<T>* childNode = grandParentNode->left->right;
+    RBNode< std::pair<K,V> >* parentNode = grandParentNode->left;
+    RBNode< std::pair<K,V> >* childNode = grandParentNode->left->right;
     grandParentNode->left = childNode;
     childNode->left = parentNode;
     parentNode->right = NULL;
     
     //swap parent and child
-    RBNode<T>* temp;
+    RBNode< std::pair<K,V> >* temp;
     temp = parentNode;
     parentNode = childNode;
     childNode = temp;
 }
 
-template<typename T>
-void Set<T>::rightStraigthLine(RBNode<T>*& grandParentNode)
+template<typename K, typename V>
+void Map<K,V>::rightStraigthLine(
+                    RBNode< std::pair<K,V> >*& grandParentNode)
 {
     //make a straight line to the right
-    RBNode<T>* parentNode = grandParentNode->right;
-    RBNode<T>* childNode = grandParentNode->right->left;
+    RBNode< std::pair<K,V> >* parentNode = grandParentNode->right;
+    RBNode< std::pair<K,V> >* childNode = grandParentNode->right->left;
     grandParentNode->right = childNode;
     childNode->right = parentNode;
     parentNode->left = NULL;
     
     //swap parent and child
-    RBNode<T>* temp;
+    RBNode< std::pair<K,V> >* temp;
     temp = parentNode;
     parentNode = childNode;
     childNode = temp;
 }
 
 
-template<typename T>
-void Set<T>::leftRotate(RBNode<T>*& greatGrandParentNode, 
-                        RBNode<T>*& grandParentNode)
+template<typename K, typename V>
+void Map<K,V>::leftRotate(
+                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
+                    RBNode< std::pair<K,V> >*& grandParentNode)
 {
     //rotation
-    RBNode<T>* parentNode = grandParentNode->right;
+    RBNode< std::pair<K,V> >* parentNode = grandParentNode->right;
     grandParentNode->right = parentNode->left;
     parentNode->left = grandParentNode;
     //swap
@@ -317,12 +343,13 @@ void Set<T>::leftRotate(RBNode<T>*& greatGrandParentNode,
         d_root = grandParentNode;
 }
 
-template<typename T>
-void Set<T>::rightRotate(RBNode<T>*& greatGrandParentNode, 
-                         RBNode<T>*& grandParentNode)
+template<typename K, typename V>
+void Map<K,V>::rightRotate(
+                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
+                    RBNode< std::pair<K,V> >*& grandParentNode)
 {
     //rotation
-    RBNode<T>* parentNode = grandParentNode->left;
+    RBNode< std::pair<K,V> >* parentNode = grandParentNode->left;
     grandParentNode->left = parentNode->right;
     parentNode->right = grandParentNode;
     //swap
@@ -340,53 +367,73 @@ void Set<T>::rightRotate(RBNode<T>*& greatGrandParentNode,
 }
 
 
+template<typename K, typename V> 
+V& Map<K,V>::at(K const& key)
+{
+    std::pair< RBNode< std::pair<K,V> >*, bool > found = find(key);
+    if (!found.second)
+        throw std::runtime_error("item does not exist in map");
+    return found.first->second;
+}
 
-template<typename T>
-std::pair< RBNode<T>*, bool > Set<T>::find(T const& value)
+template<typename K, typename V>
+V& Map<K,V>::operator[](K const& key)
+{
+    std::pair< RBNode< std::pair<K,V> >*, bool > found = find(key);
+    if (!found.second)
+        found = insert(std::pair<K,V>(key,
+                       std::numeric_limits<V>::lowest()));
+    return found.first->second;
+}
+
+
+template<typename K, typename V>
+std::pair< RBNode< std::pair<K,V> >*, bool > Map<K,V>::find(K const& key)
 {
     //if empty list, return null
     if (!d_root)
-        return std::pair< RBNode<T>*, bool >(NULL, false);
+        return std::pair< RBNode< std::pair<K,V> >*, bool >(NULL, false);
     
     //binary search, return false if nothing found
-    RBNode<T>* cur = d_root;
+    RBNode< std::pair<K,V> >* cur = d_root;
     while (cur)
     {
-        if (cur->value == value)
-            return std::pair< RBNode<T>*, bool >(cur, true);
-        else if (value < cur->value)
+        if (key == cur->value.first)
+            return std::pair< RBNode< std::pair<K,V> >*, bool >(cur, true);
+        else if (key < cur->value.first)
             cur = (cur->left) ? cur->left: NULL;
         else
             cur = (cur->right) ? cur->right: NULL;
     }
-    return std::pair< RBNode<T>*, bool >(NULL, false);
+    return std::pair< RBNode< std::pair<K,V> >*, bool >
+            (cur, false);
 }
 
-template<typename T>
-RBNode<T>* Set<T>::first()
+template<typename K, typename V>
+RBNode< std::pair<K,V> >* Map<K,V>::first()
 {
-    RBNode<T>* cur = d_root;
+    RBNode< std::pair<K,V> >* cur = d_root;
     while (cur->left) cur = cur->left;
     return cur;
 }
 
-template<typename T>
-RBNode<T>* Set<T>::last()
+template<typename K, typename V>
+RBNode< std::pair<K,V> >* Map<K,V>::last()
 {
-    RBNode<T>* cur = d_root;
+    RBNode< std::pair<K,V> >* cur = d_root;
     while (cur->right) cur = cur->right;
     return cur;
 }
 
 
-template<typename T>
-unsigned Set<T>::blackDepth(RBNode<T>* node)
+template<typename K, typename V>
+unsigned Map<K,V>::blackDepth(RBNode< std::pair<K,V> >* node)
 {
     //count the number of black nodes from the root to node
     unsigned dep = 0;
-    SingleUnsortedList< RBNode<T>* > queue;
+    SingleUnsortedList< RBNode< std::pair<K,V> >* > queue;
     queue.append(d_root);
-    RBNode<T>* cur = queue.pop();
+    RBNode< std::pair<K,V> >* cur = queue.pop();
     while (queue.size() || cur)
     {
         //count number of black nodes 
@@ -406,14 +453,14 @@ unsigned Set<T>::blackDepth(RBNode<T>* node)
     return dep;
 }
     
-template<typename T>
-unsigned Set<T>::blackHeigth()
+template<typename K, typename V>
+unsigned Map<K,V>::blackHeigth()
 {
     //count the number of black nodes from the root to node
     unsigned dep = 0;
-    SingleUnsortedList< RBNode<T>* > queue;
+    SingleUnsortedList< RBNode< std::pair<K,V> >* > queue;
     queue.append(d_root);
-    RBNode<T>* cur = queue.pop();
+    RBNode< std::pair<K,V> >* cur = queue.pop();
     while (queue.size() || cur)
     {
         //count number of black nodes 
@@ -432,10 +479,10 @@ unsigned Set<T>::blackHeigth()
     return dep;
 }
 
-template<typename T>
-unsigned Set<T>::depth(RBNode<T>* node)
+template<typename K, typename V>
+unsigned Map<K,V>::depth(RBNode< std::pair<K,V> >* node)
 {
-    typedef std::pair< RBNode<T>*, unsigned> PairLevel;
+    typedef std::pair< RBNode< std::pair<K,V> >*, unsigned> PairLevel;
     unsigned dep = 0;
     SingleUnsortedList< PairLevel > queue;
     queue.append( PairLevel(node, 0) );
@@ -460,11 +507,13 @@ unsigned Set<T>::depth(RBNode<T>* node)
 }
 
 
-template<typename T>
-void Set<T>::print()
+template<typename K, typename V>
+void Map<K,V>::print()
 {
-    SingleUnsortedList< std::pair<RBNode<T>* , unsigned> > queue;
-    std::pair<RBNode<T>* , unsigned> cur(d_root, 0);
+    SingleUnsortedList< 
+            std::pair<RBNode< std::pair<K,V> >* , 
+            unsigned> > queue;
+    std::pair<RBNode< std::pair<K,V> >* , unsigned> cur(d_root, 0);
     unsigned level = 0;
     while (queue.size() || cur.first)
     {
@@ -473,7 +522,8 @@ void Set<T>::print()
             std::cout << std::endl;
             ++level;
         }
-        std::cout << cur.first->value
+        std::cout << cur.first->value.first << ":"
+                  << cur.first->value.second
                   << "(" << ( (cur.first->red)? "r":"b") << ")";
         if (cur.first->left && cur.first->right)
             std::cout << "(LR)" ;
@@ -486,16 +536,16 @@ void Set<T>::print()
         std::cout << "  ";
 
         if (cur.first->left)
-            queue.append(std::pair<RBNode<T>* , unsigned>
+            queue.append(std::pair<RBNode< std::pair<K,V> >* , unsigned>
                             (cur.first->left, level+1));
         if (cur.first->right)
-            queue.append(std::pair<RBNode<T>* , unsigned>
+            queue.append(std::pair<RBNode< std::pair<K,V> >* , unsigned>
                             (cur.first->right, level+1));
 
         if (queue.size() > 0)
             cur = queue.pop();
         else
-            cur = std::pair<RBNode<T>* , unsigned>(NULL, 0);
+            cur = std::pair<RBNode< std::pair<K,V> >* , unsigned>(NULL, 0);
     }
     std::cout << std::endl;
 }

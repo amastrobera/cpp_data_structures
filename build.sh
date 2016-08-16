@@ -5,7 +5,7 @@
 makeAllWithOptions()
 {
     #make array
-    cd $build_path/dynamic_array 
+    cd $build_path/vector
     make $1
 
     #make node
@@ -27,6 +27,10 @@ makeAllWithOptions()
 	#make rb tree set
     cd $build_path/set
     make $1
+
+	#make rb tree map
+	cd $build_path/map
+	make $1
 
     #finish, come back
     cd $build_path
