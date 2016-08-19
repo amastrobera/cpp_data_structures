@@ -389,7 +389,7 @@ V& Map<K,V>::at(K const& key)
     std::pair< RBNode< std::pair<K,V> >*, bool > found = find(key);
     if (!found.second)
         throw std::runtime_error("item does not exist in map");
-    return found.first->second;
+    return found.first->value.second;
 }
 
 template<typename K, typename V>
@@ -399,7 +399,7 @@ V& Map<K,V>::operator[](K const& key)
     if (!found.second)
         found = insert(std::pair<K,V>(key,
                        std::numeric_limits<V>::lowest()));
-    return found.first->second;
+    return found.first->value.second;
 }
 
 

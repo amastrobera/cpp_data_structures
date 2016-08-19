@@ -59,12 +59,19 @@ void testMap()
     assert (9 == last->value.second && "    >>> failed");
 
     //operator[]
-    //todo
+    std::cout << "    * operator[]" << std::endl;
+    intMap["e"] = 20;
+    assert (20 == intMap["e"] && "    >>> failed");
+    intMap["z"] = 10;
+    assert (10 == intMap.size() && "    >>> failed");
+    assert (10 == intMap["z"] && "    >>> failed");
     
     //at
-    //todo
-    
-    
+    std::cout << "    * at" << std::endl;
+    intMap.at("e") = 25;
+    assert (25 == intMap.at("e") && "    >>> failed");
+
+    //todo: erase
         
     std::cout << "OK" << std::endl;
 }
