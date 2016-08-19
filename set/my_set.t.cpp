@@ -19,7 +19,7 @@ void testSet()
     std::cout << "    * insert" << std::endl;
     intSet.insert(1);
     intSet.insert(2);
-    intSet.insert(3);
+    assert (3 == intSet.insert(3).first->value && "    >>> failed insertion");
     assert (3 == intSet.size() && "    >>> failed");
 
     //balancing
@@ -29,7 +29,7 @@ void testSet()
     intSet.insert(5);
     intSet.insert(0);
     intSet.insert(-1);
-    intSet.insert(-2);
+    assert (-2 == intSet.insert(-2).first->value && "    >>> failed insertion");
     intSet.print();
     assert (true == intSet.isBalanced() && "    >>> failed");
 

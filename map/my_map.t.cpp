@@ -19,42 +19,44 @@ void testMap()
     std::cout << "    * insert" << std::endl;
     intMap.insert(std::pair<std::string, int>("a", 1));
     intMap.insert(std::pair<std::string, int>("b", 2));
-    intMap.insert(std::pair<std::string, int>("c", 3));
+    assert (3 == intMap.insert(
+                std::pair<std::string, int>("c", 3)).first->value.second && 
+                "    >>> failed insertion");
     assert (3 == intMap.size() && "    >>> failed");
 
     //balancing
     std::cout << "    * balancing" << std::endl;
-    intMap.insert(std::pair<std::string, int>("f", 6));
-    intMap.insert(std::pair<std::string, int>("h", 7));
     intMap.insert(std::pair<std::string, int>("d", 4));
     intMap.insert(std::pair<std::string, int>("e", 5));
-    intMap.insert(std::pair<std::string, int>("l", 9));
-    intMap.insert(std::pair<std::string, int>("i", 8));
-    
+    intMap.insert(std::pair<std::string, int>("f", 6));
+    intMap.insert(std::pair<std::string, int>("g", 7));
+    intMap.insert(std::pair<std::string, int>("h", 8));
+    assert (9 == intMap.insert(
+                std::pair<std::string, int>("i", 9)).first->value.second && 
+                "    >>> failed insertion");    
     intMap.print();
-////todo: bug on insertion: bad source of algorithm
-//    assert (true == intMap.isBalanced() && "    >>> failed");
+    assert (true == intMap.isBalanced() && "    >>> failed");
 
 
-//    //find
-//    std::cout << "    * find" << std::endl;
-//    std::pair< RBNode< std::pair<std::string, int> >*, 
-//                            bool > found = intMap.find("d");
-//    assert (true == found.second && "    >>> failed found(d)");
-//    assert (4 == found.first->value.second && "    >>> failed found(d)");
-//    std::pair< RBNode< std::pair<std::string, int> >*, 
-//                            bool > notFound = intMap.find("q");
-//    assert (false == notFound.second && "    >>> failed not found(q)");
-//    assert (NULL == notFound.first && "    >>> failed not found(q)");
+    //find
+    std::cout << "    * find" << std::endl;
+    std::pair< RBNode< std::pair<std::string, int> >*, 
+                            bool > found = intMap.find("d");
+    assert (true == found.second && "    >>> failed found(d)");
+    assert (4 == found.first->value.second && "    >>> failed found(d)");
+    std::pair< RBNode< std::pair<std::string, int> >*, 
+                            bool > notFound = intMap.find("q");
+    assert (false == notFound.second && "    >>> failed not found(q)");
+    assert (NULL == notFound.first && "    >>> failed not found(q)");
 
-//    //first and last
-//    std::cout << "    * first and last" << std::endl;
-//    RBNode< std::pair<std::string, int> >* first = intMap.first();
-//    assert ("a" == first->value.first && "    >>> failed");
-//    assert (1 == first->value.second && "    >>> failed");
-//    RBNode< std::pair<std::string, int> >* last = intMap.last();
-//    assert ("l" == last->value.first && "    >>> failed");
-//    assert (9 == last->value.second && "    >>> failed");
+    //first and last
+    std::cout << "    * first and last" << std::endl;
+    RBNode< std::pair<std::string, int> >* first = intMap.first();
+    assert ("a" == first->value.first && "    >>> failed");
+    assert (1 == first->value.second && "    >>> failed");
+    RBNode< std::pair<std::string, int> >* last = intMap.last();
+    assert ("i" == last->value.first && "    >>> failed");
+    assert (9 == last->value.second && "    >>> failed");
 
     //operator[]
     //todo

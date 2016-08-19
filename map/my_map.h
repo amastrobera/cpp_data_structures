@@ -16,7 +16,7 @@
 namespace my_data_structures 
 {
 
-unsigned const map_max_depth_imbalance = 2;
+unsigned const map_max_maxDepth_imbalance = 2;
 
 //Double linked list: the last and the first are linked in a circle
 template<typename K, typename V>
@@ -51,8 +51,8 @@ public:
     //temporary test functions, make friend to private test methods
     void print();
     bool isBalanced() { return (d_size <= 3 ) ? true : 
-            std::abs(depth(d_root->left) - depth(d_root->right)) < 2;
-                        }
+            std::abs((int)maxDepth(d_root->left) - 
+                        (int)maxDepth(d_root->right)) < 2;}
     
 private:
     unsigned d_size;
@@ -61,7 +61,7 @@ private:
 
     //todo: what to do with those measures ?
     //max number of levels from node, downwards
-    unsigned depth(
+    unsigned maxDepth(
                     RBNode< std::pair<K,V> >* node);
     //number of black nodes from root to node
     unsigned blackDepth(
@@ -70,12 +70,8 @@ private:
     unsigned blackHeigth();
     
     //rebalancing function for insertion
-    void insertRebalance(
-                    RBNode< std::pair<K,V> >*& greatGrandParentNode,
-                    RBNode< std::pair<K,V> >*& grandParentNode, 
-                    RBNode< std::pair<K,V> >* parentNode, 
-                    RBNode< std::pair<K,V> >* uncleNode, 
-                    RBNode< std::pair<K,V> >* childNode);
+    bool insertRebalance(
+                    RBNode< std::pair<K,V> >*& childNode);
 
     unsigned insertRebalanceCase(
                     RBNode< std::pair<K,V> >* grandParentNode,
@@ -84,21 +80,27 @@ private:
                     RBNode< std::pair<K,V> >* childNode) const;
 
     void recolourNodes(
-                    RBNode< std::pair<K,V> >*& grandParentNode);
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode, 
+                    RBNode< std::pair<K,V> >*& uncleNode);
 
     void leftStraigthLine(
-                    RBNode< std::pair<K,V> >*& grandParentNode);
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode, 
+                    RBNode< std::pair<K,V> >*& childNode);
     
     void rightStraigthLine(
-                    RBNode< std::pair<K,V> >*& grandParentNode);
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode, 
+                    RBNode< std::pair<K,V> >*& childNode);
     
     void leftRotate(
-                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
-                    RBNode< std::pair<K,V> >*& grandParentNode);
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode);
    
     void rightRotate(
-                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
-                    RBNode< std::pair<K,V> >*& grandParentNode);
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode);
                      
 };
 
@@ -131,14 +133,11 @@ std::pair< RBNode< std::pair<K,V> >*, bool> Map<K,V>::insert(
     {
         d_root = node;
         ++d_size;
-        return std::pair< RBNode< std::pair<K,V> >*, bool>(NULL, false);
+        return std::pair< RBNode< std::pair<K,V> >*, bool>(node, true);
     }
 
     //second+ node: find the append point by comparing (ASC) existing nodes
-    RBNode< std::pair<K,V> >* greatGrandParentNode = NULL;
-    RBNode< std::pair<K,V> >* grandParentNode = NULL;
     RBNode< std::pair<K,V> >* parentNode = d_root;
-    RBNode< std::pair<K,V> >* uncleNode = NULL;
     bool found = false;
     while (!found)
     {
@@ -149,91 +148,92 @@ std::pair< RBNode< std::pair<K,V> >*, bool> Map<K,V>::insert(
         }
         else if (value.first > parentNode->value.first)
         { //to the right
-            if (parentNode->right)
-            { // move fwd
-                greatGrandParentNode = grandParentNode;
-                grandParentNode = parentNode;
-                uncleNode = parentNode->left;
+            if (parentNode->right) // move fwd
                 parentNode = parentNode->right;
-            }
             else
             { // add node to the right side and rebalance
                 node->red = true;
                 parentNode->right = node;
+                node->parent = parentNode;
                 ++d_size;
-                insertRebalance(greatGrandParentNode,
-                                grandParentNode, 
-                                parentNode, 
-                                uncleNode, 
-                                parentNode->right);
                 found = true;
             }
         }
         else
         { //to the left 
-            if (parentNode->left)
-            { // move fwd
-                greatGrandParentNode = grandParentNode;
-                grandParentNode = parentNode;
-                uncleNode = parentNode->right;
+            if (parentNode->left) // move fwd
                 parentNode = parentNode->left;
-            }
             else
             { //add node on the left side and rebalance
                 node->red = true;
                 parentNode->left = node;
+                node->parent = parentNode;
                 ++d_size;
-                insertRebalance(greatGrandParentNode, 
-                                grandParentNode, 
-                                parentNode, 
-                                uncleNode, 
-                                parentNode->left);
                 found = true;
             }
         }
     }
     
-    return std::pair< RBNode< std::pair<K,V> >*, bool>(NULL, false);
+    RBNode< std::pair<K,V> >* rebalanceNode = node;
+    while (!insertRebalance(rebalanceNode) && rebalanceNode) 
+            rebalanceNode = (rebalanceNode->parent && 
+                             rebalanceNode->parent->parent) ? 
+                             rebalanceNode->parent->parent : NULL;
+    
+    return std::pair< RBNode< std::pair<K,V> >*, bool>(node, true);
 }
 
 template<typename K, typename V>
-void Map<K,V>::insertRebalance(
-                    RBNode< std::pair<K,V> >*& greatGrandParentNode,
-                    RBNode< std::pair<K,V> >*& grandParentNode,
-                    RBNode< std::pair<K,V> >* parentNode,
-                    RBNode< std::pair<K,V> >* uncleNode,
-                    RBNode< std::pair<K,V> >* childNode)
+bool Map<K,V>::insertRebalance(RBNode< std::pair<K,V> >*& childNode)
 {
+    RBNode< std::pair<K,V> >* parentNode = 
+                (childNode->parent) ? childNode->parent : NULL;
+
+    RBNode< std::pair<K,V> >* grandParentNode = 
+                (parentNode && parentNode->parent) ? parentNode->parent : NULL;
+
+    RBNode< std::pair<K,V> >* uncleNode = 
+                (grandParentNode) ? 
+                    ( (grandParentNode->left == parentNode) ? 
+                        grandParentNode->right: grandParentNode->left ) : 
+                NULL;
+
     switch (insertRebalanceCase(grandParentNode, 
-                                  parentNode, 
-                                  uncleNode, 
-                                  childNode))
+                                parentNode, 
+                                uncleNode, 
+                                childNode))
     {
         case 0: //nothing to rebalance
-            break;
+            return true;
+            break;//warning safeguard
 
         case 1: //colour nodes
-            recolourNodes(grandParentNode);
+            recolourNodes(grandParentNode, parentNode, uncleNode);
             break;
 
         case 2: //make it a case 3 and manage it
             if (parentNode == grandParentNode->left &&
                             childNode == parentNode->right)
-                leftStraigthLine(grandParentNode);
+                leftStraigthLine(grandParentNode, parentNode, childNode);
             else
-                rightStraigthLine(grandParentNode);
+                rightStraigthLine(grandParentNode, parentNode, childNode);
             //fallthrough case 3
             
         case 3: //rotate
             if (parentNode == grandParentNode->left &&
                             childNode == parentNode->left)
-                rightRotate(greatGrandParentNode, 
-                            grandParentNode);
+                rightRotate(grandParentNode, parentNode);
             else
-                leftRotate(greatGrandParentNode, 
-                           grandParentNode);
+                leftRotate(grandParentNode, parentNode);
             break;
     }
+    // in cases 1 and 3, check if the tree is balanced: 
+    //return false, if there is a violation of type "red parent, red child"
+    if (grandParentNode && grandParentNode->parent && 
+                            grandParentNode->parent->red)
+        return false;
+    else
+        return true;
 }    
 
 template<typename K, typename V>
@@ -275,95 +275,111 @@ unsigned Map<K,V>::insertRebalanceCase(
 
 template<typename K, typename V>
 void Map<K,V>::recolourNodes(
-                    RBNode< std::pair<K,V> >*& grandParentNode)
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode, 
+                    RBNode< std::pair<K,V> >*& uncleNode)
 {
     //set parent and uncle nodes black, grandparent red
-    if (grandParentNode->left) grandParentNode->left->red = false;
-    if (grandParentNode->right) grandParentNode->right->red = false;
+    parentNode->red = uncleNode->red = false;
     if (grandParentNode != d_root) grandParentNode->red = true;
 }
 
 template<typename K, typename V>
 void Map<K,V>::leftStraigthLine(
-                    RBNode< std::pair<K,V> >*& grandParentNode)
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode, 
+                    RBNode< std::pair<K,V> >*& childNode)
 {
-    //make a straight line to the left
-    RBNode< std::pair<K,V> >* parentNode = grandParentNode->left;
-    RBNode< std::pair<K,V> >* childNode = grandParentNode->left->right;
     grandParentNode->left = childNode;
+
+    RBNode< std::pair<K,V> >* grandChildNode = childNode->right;
+    childNode->parent = grandParentNode;
     childNode->left = parentNode;
-    parentNode->right = NULL;
+    childNode->right = NULL;
     
-    //swap parent and child
-    RBNode< std::pair<K,V> >* temp;
-    temp = parentNode;
+    parentNode->right = grandChildNode;
+    parentNode->parent = childNode;
+    
+    //swap parent and child 
+    RBNode< std::pair<K,V> >* swapNode;
+    swapNode = parentNode;
     parentNode = childNode;
-    childNode = temp;
+    childNode = swapNode;
 }
 
 template<typename K, typename V>
 void Map<K,V>::rightStraigthLine(
-                    RBNode< std::pair<K,V> >*& grandParentNode)
+                    RBNode< std::pair<K,V> >*& grandParentNode,
+                    RBNode< std::pair<K,V> >*& parentNode, 
+                    RBNode< std::pair<K,V> >*& childNode)
 {
-    //make a straight line to the right
-    RBNode< std::pair<K,V> >* parentNode = grandParentNode->right;
-    RBNode< std::pair<K,V> >* childNode = grandParentNode->right->left;
     grandParentNode->right = childNode;
-    childNode->right = parentNode;
-    parentNode->left = NULL;
-    
-    //swap parent and child
-    RBNode< std::pair<K,V> >* temp;
-    temp = parentNode;
-    parentNode = childNode;
-    childNode = temp;
-}
 
+    RBNode< std::pair<K,V> >* grandChildNode = childNode->left;
+    childNode->parent = grandParentNode;
+    childNode->right = parentNode;
+    childNode->left = NULL;
+    
+    parentNode->left = grandChildNode;
+    parentNode->parent = childNode;
+    
+    //swap parent and child 
+    RBNode< std::pair<K,V> >* swapNode;
+    swapNode = parentNode;
+    parentNode = childNode;
+    childNode = swapNode;
+}
 
 template<typename K, typename V>
 void Map<K,V>::leftRotate(
-                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
-                    RBNode< std::pair<K,V> >*& grandParentNode)
+                        RBNode< std::pair<K,V> >*& grandParentNode,
+                        RBNode< std::pair<K,V> >*& parentNode)
 {
-    //rotation
-    RBNode< std::pair<K,V> >* parentNode = grandParentNode->right;
+    RBNode< std::pair<K,V> >* greatGrandParentNode = grandParentNode->parent;
+    
+    grandParentNode->parent = parentNode;
     grandParentNode->right = parentNode->left;
+    grandParentNode->red = true;
+
+    parentNode->parent = greatGrandParentNode;
     parentNode->left = grandParentNode;
-    //swap
-    grandParentNode = parentNode;
-    //colour change
-    grandParentNode->red = false;
-    grandParentNode->left->red = grandParentNode->right->red = true;
-    if (grandParentNode->left->left) 
-        grandParentNode->left->left->red = false;
-    //attach new node to the original tree
-    if (greatGrandParentNode)
-        greatGrandParentNode->right = grandParentNode;
-    else if (d_size == 3)
-        d_root = grandParentNode;
+    parentNode->red = false;
+
+    if (grandParentNode == d_root)
+        d_root = parentNode;
+    else
+    {
+        if (greatGrandParentNode->left == grandParentNode)
+            greatGrandParentNode->left = parentNode;
+        else
+            greatGrandParentNode->right = parentNode;
+    }
 }
 
 template<typename K, typename V>
 void Map<K,V>::rightRotate(
-                    RBNode< std::pair<K,V> >*& greatGrandParentNode, 
-                    RBNode< std::pair<K,V> >*& grandParentNode)
+                        RBNode< std::pair<K,V> >*& grandParentNode, 
+                        RBNode< std::pair<K,V> >*& parentNode)
 {
-    //rotation
-    RBNode< std::pair<K,V> >* parentNode = grandParentNode->left;
+    RBNode< std::pair<K,V> >* greatGrandParentNode = grandParentNode->parent;
+
+    grandParentNode->parent = parentNode;
     grandParentNode->left = parentNode->right;
+    grandParentNode->red = true;
+
+    parentNode->parent = greatGrandParentNode;
     parentNode->right = grandParentNode;
-    //swap
-    grandParentNode = parentNode;
-    //colour change
-    grandParentNode->red = false;
-    grandParentNode->left->red = grandParentNode->right->red = true;
-    if (grandParentNode->right->right)
-        grandParentNode->right->right->red = false;
-    //attach new node to the original tree
-    if (greatGrandParentNode)
-        greatGrandParentNode->left = grandParentNode;
-    else if (d_size == 3)
-        d_root = grandParentNode;
+    parentNode->red = false;
+
+    if (grandParentNode == d_root)
+        d_root = parentNode;
+    else
+    {
+        if (greatGrandParentNode->left == grandParentNode)
+            greatGrandParentNode->left = parentNode;
+        else
+            greatGrandParentNode->right = parentNode;
+    }
 }
 
 
@@ -429,67 +445,71 @@ RBNode< std::pair<K,V> >* Map<K,V>::last()
 template<typename K, typename V>
 unsigned Map<K,V>::blackDepth(RBNode< std::pair<K,V> >* node)
 {
-    //count the number of black nodes from the root to node
-    unsigned dep = 0;
-    SingleUnsortedList< RBNode< std::pair<K,V> >* > queue;
-    queue.append(d_root);
-    RBNode< std::pair<K,V> >* cur = queue.pop();
-    while (queue.size() || cur)
-    {
-        //count number of black nodes 
-        if (!cur->red) ++dep;
-        if (cur == node) break; //exit when you the running ptr finds node
-        
-        //append the next nodes to the queue\, if any
-        if (cur->left) queue.append(cur->left);
-        if (cur->right) queue.append(cur->right);
+//    //count the number of black nodes from the root to node
+//    unsigned dep = 0;
+//    SingleUnsortedList< RBNode< std::pair<K,V> >* > queue;
+//    queue.append(d_root);
+//    RBNode< std::pair<K,V> >* cur = queue.pop();
+//    while (queue.size() || cur)
+//    {
+//        //count number of black nodes 
+//        if (!cur->red) ++dep;
+//        if (cur == node) break; //exit when you the running ptr finds node
+//        
+//        //append the next nodes to the queue\, if any
+//        if (cur->left) queue.append(cur->left);
+//        if (cur->right) queue.append(cur->right);
 
-        //update the running ptr
-        if(queue.size())
-            cur = queue.pop();
-        else
-            cur = NULL;
-    }
-    return dep;
+//        //update the running ptr
+//        if(queue.size())
+//            cur = queue.pop();
+//        else
+//            cur = NULL;
+//    }
+//    return dep;
+return 0;
 }
     
 template<typename K, typename V>
 unsigned Map<K,V>::blackHeigth()
 {
-    //count the number of black nodes from the root to node
-    unsigned dep = 0;
-    SingleUnsortedList< RBNode< std::pair<K,V> >* > queue;
-    queue.append(d_root);
-    RBNode< std::pair<K,V> >* cur = queue.pop();
-    while (queue.size() || cur)
-    {
-        //count number of black nodes 
-        if (!cur->red) ++dep;
-        
-        //append the next nodes to the queue\, if any
-        if (cur->left) queue.append(cur->left);
-        if (cur->right) queue.append(cur->right);
+//    //count the number of black nodes from the root to node
+//    unsigned dep = 0;
+//    SingleUnsortedList< RBNode< std::pair<K,V> >* > queue;
+//    queue.append(d_root);
+//    RBNode< std::pair<K,V> >* cur = queue.pop();
+//    while (queue.size() || cur)
+//    {
+//        //count number of black nodes 
+//        if (!cur->red) ++dep;
+//        
+//        //append the next nodes to the queue\, if any
+//        if (cur->left) queue.append(cur->left);
+//        if (cur->right) queue.append(cur->right);
 
-        //update the running ptr
-        if(queue.size())
-            cur = queue.pop();
-        else
-            cur = NULL;
-    }
-    return dep;
+//        //update the running ptr
+//        if(queue.size())
+//            cur = queue.pop();
+//        else
+//            cur = NULL;
+//    }
+//    return dep;
+return 0;
 }
 
 template<typename K, typename V>
-unsigned Map<K,V>::depth(RBNode< std::pair<K,V> >* node)
+unsigned Map<K,V>::maxDepth(RBNode< std::pair<K,V> >* node)
 {
     typedef std::pair< RBNode< std::pair<K,V> >*, unsigned> PairLevel;
     unsigned dep = 0;
     SingleUnsortedList< PairLevel > queue;
-    queue.append( PairLevel(node, 0) );
-    PairLevel cur = queue.pop();
-    while (queue.size() || cur.first)
+    queue.append( PairLevel(node, 1) );
+    PairLevel cur;
+    while (queue.size())
     {
-        if (cur.second > dep) 
+        cur = queue.pop();
+            
+        if (cur.second > dep)
             ++dep;
         if (cur.first->left) 
             queue.append(PairLevel(cur.first->left, 
@@ -497,11 +517,6 @@ unsigned Map<K,V>::depth(RBNode< std::pair<K,V> >* node)
         if (cur.first->right) 
             queue.append(PairLevel(cur.first->right, 
                                     cur.second+1));
-
-        if(queue.size())
-            cur = queue.pop();
-        else
-            cur = PairLevel(NULL, 0);
     }
     return dep;
 }

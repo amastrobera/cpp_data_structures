@@ -76,7 +76,9 @@ void testRBNode()
     //next
     std::cout << "    * append left" << std::endl;
     n1->left = new RBNode<int>(2);
+    n1->left->parent = n1;
     assert (2 == n1->left->value && "    >>> failed");
+    assert (1 == n1->left->parent->value && "    >>> failed");
     assert (NULL == n1->left->left && "    >>> failed");
     assert (NULL == n1->left->right && "    >>> failed");
     

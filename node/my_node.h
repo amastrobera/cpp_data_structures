@@ -36,7 +36,9 @@ template<typename T>
 struct RBNode : public Node<T>
 {
     RBNode(T const& v): Node<T>(v), 
-						left(NULL), right(NULL), red(false) {}
+						parent(NULL), left(NULL), right(NULL), 
+						red(false) {}
+    RBNode* parent;
     RBNode* left;
     RBNode* right;
     bool red;

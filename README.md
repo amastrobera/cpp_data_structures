@@ -22,7 +22,6 @@ C++03, naked pointers, built with Makefile
 * map (RB tree)
 
 ##### todo #####
-* bug on RB insert algorithm, wrong source 
 * add function delete to set and map
 * iterators for all 
 * build script concurrent
