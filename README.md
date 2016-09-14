@@ -20,6 +20,7 @@ C++03, naked pointers, built with Makefile
 * linked_list double (circular, sorted)
 * set (RB tree)
 * map (RB tree)
+* unordered_map (hash table)
 
 ##### todo #####
 * add function delete to set and map
