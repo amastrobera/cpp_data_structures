@@ -102,7 +102,7 @@ T& Vector<T>::bottom()
 template<typename T>
 T& Vector<T>::operator[](unsigned const k)
 {
-    if (k >= d_num) throw std::runtime_error("not value for this index");
+    if (k >= d_size) throw std::runtime_error("not value for this index");
     return d_array[k];
 }
 

@@ -23,7 +23,8 @@ C++03, naked pointers, built with Makefile
 * unordered_map (hash table)
 
 ##### todo #####
-* add function delete to set and map
+* add function delete to set and map (erase)
+* add functions to hash map (erase)
 * iterators for all 
 * build script concurrent
 

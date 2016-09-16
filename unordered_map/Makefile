@@ -11,17 +11,13 @@ LIBS_CPP	= my_unordered_map.cpp
 
 OBJS		= my_unordered_map.t.o \
 			  my_unordered_map.o \
-              $(patsubst %.o,../vector/%.o, \
-			  my_vector.o) \
-			  $(patsubst %.o,../linked_list/single/unsorted/%.o, \
-			  my_single_unsorted_list.o) \
+              $(patsubst %.o,../vector/%.o, my_vector.o) \
+			  $(patsubst %.o,../node/%.o, my_node.o) \
 
-CC			= g++
+CC			= g++ --std=c++11
 CPPFLAGS	= -g -Wall -I. \
 					   -I../vector \
 					   -I../node \
-			           -I../linked_list/list \
-					   -I../linked_list/single/unsorted
 
 #commands
 build: compile link

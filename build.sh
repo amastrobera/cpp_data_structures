@@ -32,6 +32,10 @@ makeAllWithOptions()
 	cd $build_path/map
 	make $1
 
+	#make hash map
+	cd $build_path/unordered_map
+	make $1
+
     #finish, come back
     cd $build_path
 }
