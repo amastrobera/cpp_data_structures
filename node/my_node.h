@@ -1,6 +1,6 @@
 // single knot node
 
-#ifndef NULL_H
+#ifndef NULL
 #define NULL 0
 #endif
 

@@ -1,7 +1,7 @@
 // vector (dynamic array)
 // not thread safe yet
 
-#ifndef NULL_H
+#ifndef NULL
 #define NULL 0
 #endif
 
