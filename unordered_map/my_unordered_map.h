@@ -1,6 +1,6 @@
 // Hash Map
 // based on a bucket of 31 cells (dynamic array) 
-//          and a doubly linked list for store values (close hashing mode)
+// and a doubly linked list (no cyclical) for store values (close hashing mode)
 // not thread safe
 
 #ifndef UNORDERED_MAP_H
@@ -10,6 +10,7 @@
 #include "my_node.h"    //used for closed hashing list
 
 #include <stdexcept>
+#include <limits>
 #include <utility>
 
 namespace my_data_structures 
@@ -25,6 +26,8 @@ struct UnorderedMapIterator
     DoubleNode<std::pair<Key, Value> >* end;
 };
 
+//generic hash function, shaping any user's specialisation
+//defaults to string version of the Key
 template<typename Key = std::string >
 struct Hash
 {
@@ -51,9 +54,12 @@ public:
 
     std::pair<std::pair<Key, Value>*, bool> find(Key const& key);
 
+    Value& operator[](Key const& key);
+
     std::pair< std::pair<Key, Value>*, bool> insert(
                     std::pair<Key, Value> const& keyVal);
 
+    void erase(Key const& key);
     
 private:
     unsigned d_size;
@@ -112,19 +118,6 @@ unsigned UnorderedMap<Key,Value,HashGen>::hashFunction(Key const& key)
 
 
 //specialisation for known c++ types
-//template<>
-//struct Hash<std::string>
-//{
-//    static unsigned get(std::string const& key)
-//    {
-//        unsigned hash = 7;
-//        for (unsigned i = 0; i < key.size(); ++i)
-//            hash = hash * unordered_map_default_bucket_size + (unsigned)key[i];
-//        hash %= unordered_map_default_bucket_size;
-//        return hash;
-//    }
-//};
-
 template<>
 struct Hash<double>
 {
@@ -205,6 +198,54 @@ std::pair<std::pair<Key, Value>*, bool> UnorderedMap<Key,Value,HashGen>::find(
     return std::pair<std::pair<Key, Value>*, bool> (NULL, false);
 }
 
+template<typename Key, typename Value, typename HashGen>
+Value& UnorderedMap<Key,Value,HashGen>::operator[](Key const& key)
+{
+    //get value if exist, insert it if it doesn't
+    std::pair< std::pair<Key, Value>*, bool> found = find(key);
+    if (!found.second)
+        found = insert(std::pair<Key,Value>(key,
+                       std::numeric_limits<Value>::lowest()));
+    return found.first->second;
+}
+
+template<typename Key, typename Value, typename HashGen>
+std::pair<std::pair<Key, Value>*, bool> UnorderedMap<Key,Value,HashGen>::insert(
+                std::pair<Key, Value> const& keyVal)
+{
+    //get hash to identify the right buckets
+    unsigned hash = HashGen::get(keyVal.first); 
+    
+    //insert value 
+    //if the list is empty or the bucket is empty, insert the first item 
+    if (d_size == 0 || 
+        d_buckets[hash].begin == d_buckets[hash].end)
+    {
+        insertTopValue(keyVal);
+        d_buckets[hash].begin = d_values;
+        d_buckets[hash].end = d_values->right;
+        ++d_size;
+        return std::pair< std::pair<Key, Value>*, bool>(
+                    &d_buckets[hash].begin->value, true);
+    }
+    
+    //loop through the list and find the item with the given key
+    DoubleNode<std::pair<Key, Value> >* cur = d_buckets[hash].begin;
+    while (cur->right != d_buckets[hash].end && 
+           cur->value.first < keyVal.first)
+        cur = cur->right;
+
+    //if the key doesn't exist yet, insert in ASC order
+    if (cur->value.first != keyVal.first)
+    {   //key preceeds current value
+        DoubleNode<std::pair<Key,Value> >* ret = insertNewValue(keyVal, cur);
+        ++d_size;
+        return std::pair<std::pair<Key, Value>*, bool> (&ret->value, true);
+    }
+    
+    //do not insert duplicates: if this key exists already do nothing            
+    return std::pair<std::pair<Key, Value>*, bool> (NULL, false);
+}
 
 template<typename Key, typename Value, typename HashGen>
 DoubleNode<std::pair<Key,Value> >* UnorderedMap<Key,Value,HashGen>::insertNewValue(
@@ -256,44 +297,49 @@ void UnorderedMap<Key,Value,HashGen>::insertTopValue(
 }
 
 
+
 template<typename Key, typename Value, typename HashGen>
-std::pair< std::pair<Key, Value>*, bool> UnorderedMap<Key,Value,HashGen>::insert(
-                std::pair<Key, Value> const& keyVal)
+void UnorderedMap<Key,Value,HashGen>::erase(Key const& key)
 {
     //get hash to identify the right buckets
-    unsigned hash = HashGen::get(keyVal.first); 
+    unsigned hash = HashGen::get(key);
     
-    //insert value 
-    //if the list is empty or the bucket is empty, insert the first item 
+    //find value to delete
+    //empty list or empty bucket
     if (d_size == 0 || 
         d_buckets[hash].begin == d_buckets[hash].end)
-    {
-        insertTopValue(keyVal);
-        d_buckets[hash].begin = d_values;
-        d_buckets[hash].end = d_values->right;
-        ++d_size;
-        return std::pair< std::pair<Key, Value>*, bool>(
-                    &d_buckets[hash].begin->value, true);
-    }
+        return;
     
     //loop through the list and find the item with the given key
     DoubleNode<std::pair<Key, Value> >* cur = d_buckets[hash].begin;
     while (cur->right != d_buckets[hash].end && 
-           cur->value.first < keyVal.first)
+           cur->value.first < key)
         cur = cur->right;
 
-    //if the key doesn't exist yet, insert in ASC order
-    if (cur->value.first != keyVal.first)
-    {   //key preceeds current value
-        DoubleNode<std::pair<Key,Value> >* ret = insertNewValue(keyVal, cur);
-        ++d_size;
-        return std::pair<std::pair<Key, Value>*, bool> (&ret->value, true);
-    }
+    //if the key doesn't exist yet, nothing to do here
+    if (cur->value.first != key)
+        return;
     
-    //do not insert duplicates: if this key exists already do nothing            
-    return std::pair<std::pair<Key, Value>*, bool> (NULL, false);
+    //key is found
+    //replace pointers
+    if (cur->right)
+        cur->right->left = (cur->left) ? cur->left : NULL;
+    if (cur->left)
+        cur->left->right = (cur->right) ? cur->right : NULL;
+    
+    if (cur == d_buckets[hash].begin)
+    {
+        if (cur->right == d_buckets[hash].end)
+            d_buckets[hash].begin = d_buckets[hash].end = NULL;
+        else
+            d_buckets[hash].begin = cur->right;
+    }
+    if (cur == d_values) d_values = cur->right;
+    
+    //delete pointer and decrese size
+    delete cur;
+    --d_size;
 }
-
 
 
 } //my_data_structures

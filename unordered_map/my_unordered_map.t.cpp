@@ -35,7 +35,22 @@ void testUnorderedMap()
     std::pair< std::pair<std::string, int>*, bool> f2 = intMap.find("nano");
     assert (false == f2.second && "    >>> failed");
 
+    //erase
+    std::cout << "    * erase" << std::endl;
+    intMap.erase("nano");
+    assert (2 == intMap.size() && "    >>> failed");
+    intMap.erase("stefeno");
+    assert (1 == intMap.size() && "    >>> failed");
+    assert (false == intMap.find("stefeno").second && "    >>> failed");
 
+    //operator[]
+    std::cout << "    * operator[]" << std::endl;
+    intMap["nano"] = 26;
+    assert (2 == intMap.size() && "    >>> failed");
+    assert (26 == intMap["nano"] && "    >>> failed");
+    intMap["angelo"] = 31;
+    assert (31 == intMap["angelo"] && "    >>> failed");
+    assert (31 == intMap.find("angelo").first->second && "    >>> failed");
     
     std::cout << "OK" << std::endl;
 }
