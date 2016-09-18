@@ -8,6 +8,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+//#include "my_iterator.h"
 #include <stdexcept>
 
 namespace my_data_structures 
@@ -39,21 +40,83 @@ public:
     T pop();
     
     void removeAt(unsigned const k); //deletes the item at index k
+    
+    //iterators
+    class iterator
+    {
+    public:
+        iterator() : d_item(NULL) {}
+        iterator(T* val) : d_item(val) {}
+        iterator(iterator const& it) : d_item(it.d_item) {}
+        ~iterator() {}
+
+        //advances and retreats
+        iterator& operator++() {++this->d_item; return *this;} //++it
+        iterator& operator++(int unused) {return operator++();} //it++
+        iterator& operator--() {--this->d_item; return *this;} //--it
+        iterator& operator--(int unused) {return operator--();}//it--
         
+        //dereferences and returns the object pointed to
+        T& operator*() { return *d_item; }
+        T& operator->() { return operator*(); }
+
+        //assignment
+        iterator& operator= (iterator const& it) 
+        { 
+            if (this != &it)
+                this->d_item = it.d_item;
+            return *this;
+        };
+        
+        //comparison operators
+        bool operator==(iterator const& rhs) const
+            {return this->d_item == rhs.d_item;} 
+        bool operator!=(iterator const& rhs) const
+            {return !(operator==(rhs));} 
+
+    private:
+        T* d_item;
+    };
+    
+    iterator begin() const { return iterator(d_array); }
+
+    iterator end() const{ return iterator(d_array + d_num); }
+    
 private:
     unsigned d_size;
+
     unsigned d_num;
+
     T* d_array;
     
     void upSize();
-    void downSize();
 };
 
 
+
+//template<typename T>
+//class Vector<T>::iterator : public Iterator<T>
+//{
+//public:
+//    iterator() : Iterator<T>() {}
+//    
+//    iterator(Vector<T>* ds) { this->d_item = ds->d_array;}
+//    
+//    iterator(T* val) : Iterator<T>(val) {}
+//    
+//protected:
+//    virtual void increment() { ++this->d_item; }
+//    
+//    virtual void decrement() { --this->d_item; }
+//};
+
+
+
 template<typename T>
-Vector<T>::Vector(unsigned size) : d_size(size), d_num(0) 
-{
-    d_array = new T[d_size];
+Vector<T>::Vector(unsigned size) 
+    : d_size(size), d_num(0) 
+{   //size + 1 (physical limit of the array == end() iterator)
+    d_array = new T[d_size+1];
 }
 
 
@@ -137,7 +200,7 @@ void Vector<T>::upSize()
 {
     //copy items into a new array
     unsigned newSize = (unsigned int) dynamic_array_upsize_factor * d_size;
-    T* newArray = new T[newSize];
+    T* newArray = new T[newSize+1];
     for (unsigned i = 0; i < d_size; ++i)
     {
         newArray[i] = d_array[i];

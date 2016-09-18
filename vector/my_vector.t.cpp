@@ -27,6 +27,22 @@ void testVector()
     std::cout << "    * opeator[]" << std::endl;
     assert ("ciao" == dyno[0] && "    >>> failed[0]");
     assert ("bello" == dyno[1] && "    >>> failed[1]");
+
+    //iterator
+    std::cout << "    * iterator" << std::endl;
+    Vector<std::string>::iterator it = dyno.begin();
+    assert ("ciao" == *it && "    >>> failed");
+    ++it;
+    assert ("bello" == *it && "    >>> failed");
+    --it;
+    assert ("ciao" == *it && "    >>> failed");
+    ++it; ++it;
+    assert (dyno.end() == it && "    >>> failed");
+    unsigned i = 0;
+    for (it = dyno.begin(); it != dyno.end(); ++it)
+        std::cout << "iter(" << ++i << "): " << *it << " >> ";
+    std::cout << std::endl;
+
     
     //top
     std::cout << "    * top" << std::endl;
