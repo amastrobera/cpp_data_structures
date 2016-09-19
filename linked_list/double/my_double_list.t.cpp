@@ -40,6 +40,24 @@ void testDoubleList()
     std::cout << "    * at " << std::endl;
     assert (1 == intList.at(1) && "    >>> failed");
 
+    //list: 0, 1, 2
+
+    //iterator
+    std::cout << "    * iterator" << std::endl;
+    DoubleList<int>::iterator it = intList.begin();
+    assert (0 == *it && "    >>> failed");
+    ++it;
+    assert (1 == *it && "    >>> failed");
+    --it;
+    assert (0 == *it && "    >>> failed");
+    ++it; ++it; ++it;
+    assert (intList.end() == it && "    >>> failed");
+    unsigned i = 0;
+    for (it = intList.begin(); it != intList.end(); ++it)
+        std::cout << "iter(" << ++i << "): " << *it << " >> ";
+    std::cout << std::endl;
+
+
     //pop
     std::cout << "    * pop " << std::endl;
     assert (0 == intList.pop() && "    >>> failed");

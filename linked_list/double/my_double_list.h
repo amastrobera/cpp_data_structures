@@ -6,6 +6,12 @@
 
 #include "my_list.h"
 
+#include <limits> //c++11 library used to build sentinel node for end() iterator
+                  //this could have been achieved with a substantial refactoring
+                  //of the current code: CircularNode(right = left)
+                  //and CircularDataNode(value, inherits CircularNode)
+                  //and DoubleNode (right and left can be null)
+                  // ... but I don't want to do it
 #include <stdexcept>
 #include <utility>
 
@@ -17,7 +23,7 @@ template<typename T>
 class DoubleList : public List<T>
 {
 public:
-    DoubleList() : List<T>(), d_root(NULL) {}
+    DoubleList();
 
     virtual ~DoubleList();
 
@@ -43,12 +49,65 @@ public:
     virtual void remove(T const& value);
     //adds a value at the bottom of the list
     virtual void removeAll(T const& value);
+
+    //iterators
+    class iterator;
+    
+    virtual iterator begin() const { return iterator(d_end->right); }
+
+    virtual iterator end() const { return iterator(d_end); }
     
 private:
+
     DoubleNode<T>* d_root;
+    
+    DoubleNode<T>* d_end;
+};
+
+
+//iterators
+template<typename T>
+class DoubleList<T>::iterator : public List<T>::iterator
+{
+public:
+
+    iterator() : List<T>::iterator(), d_node(NULL) {}
+    
+    iterator(DoubleNode<T>* node) : List<T>::iterator(&node->value),
+                                    d_node(node) {}
+
+protected:
+
+    DoubleNode<T>* d_node;
+
+    virtual void increment()
+    {
+        if (this->d_node)
+        {   //change if the iterator has been initialised
+            //once initialised the d_node can never be null, because the list is circular
+            this->d_node = this->d_node->right;
+            this->d_item = &this->d_node->value;
+        }
+    }
+    
+    void decrement()
+    {   //same comment as above (increment)
+        if (this->d_node)
+        {
+            this->d_node = this->d_node->left;
+            this->d_item = &this->d_node->value;
+        }
+    }
     
 };
 
+template<typename T> 
+DoubleList<T>::DoubleList() 
+: List<T>(), d_root(NULL), d_end(new DoubleNode<T>(
+                                    std::numeric_limits<T>::lowest())) 
+{
+    d_end->right = d_end->left = d_end;    
+}
 
 template<typename T> 
 DoubleList<T>::~DoubleList()
@@ -74,23 +133,15 @@ void DoubleList<T>::insert(T const& value)
     if (!d_root)
     { 
         d_root = node;
-        d_root->right = d_root->left = d_root;
-        ++this->d_size;
-        return;
-    }
-    //second node
-    if (d_root->left == d_root)
-    {
-        node->right = node->left = d_root;
-        d_root->right = d_root->left = node;
-        if (value < d_root->value) d_root = node;
+        d_root->right = d_root->left = d_end;
+        d_end->right = d_end->left = d_root;
         ++this->d_size;
         return;
     }
     
-    //third+ : add it at the left of the root, and reset all links to/from it
+    //second+ : add it at the left of the root, and reset all links to/from it
     DoubleNode<T>* cur = d_root;
-    while (cur != d_root->left &&
+    while (cur->right != d_end &&
            value >= cur->value) cur = cur->right;
     if (value < cur->value)
     {
@@ -120,7 +171,7 @@ template<typename T>
 T& DoubleList<T>::bottom()
 {
     if (this->d_size == 0) throw std::runtime_error("empty list");
-    return (d_root->left) ? d_root->left->value : d_root->value;
+    return d_end->left->value;
 }
 
 template<typename T> 
@@ -131,7 +182,8 @@ T& DoubleList<T>::at(unsigned const k)
     if (k < (unsigned int)this->d_size/2)
         for (unsigned i = 0; i < k; ++i) cur = cur->right;
     else 
-        for (unsigned i = this->d_size; i > k; --i) cur = cur->left;
+        //consider also d_end
+        for (unsigned i = this->d_size; i >= k; --i) cur = cur->left;
         
     return cur->value;
 }
@@ -142,17 +194,11 @@ T DoubleList<T>::pop()
     if (this->d_size == 0) throw std::runtime_error("empty list");
     T val = d_root->value;
     DoubleNode<T>* tgt = d_root;
-    if (this->d_size == 2)
-    {//two nodes only
-        d_root = d_root->left;
-        delete tgt;
-        d_root->left = d_root->right = d_root;
-    }
-    else if (this->d_size == 1)
+    if (this->d_size == 1)
     {//one node only
-        d_root->left = d_root->right = NULL;
-        delete tgt;
         d_root = NULL;
+        d_end->left = d_end->right = d_end;
+        delete tgt;
     }
     else
     {//more than two nodes 
@@ -179,7 +225,7 @@ std::pair< DoubleNode<T>*, bool > DoubleList<T>::find(T const& value)
     //otherwise loop through the who list until you find the value
     //if you hit the root again, the value is not in the list
     DoubleNode<T>* cur = d_root->right;
-    while (cur != d_root && cur->value < value) cur = cur->right;
+    while (cur->right != d_end && cur->value < value) cur = cur->right;
     
     if (cur->value == value)
         return std::pair< DoubleNode<T>*, bool >(cur, true);
@@ -194,16 +240,22 @@ void DoubleList<T>::remove(T const& value)
     if (this->d_size == 0) throw std::runtime_error("empty list");
     
     DoubleNode<T>* cur = d_root;
-    while (cur->value != value && 
-           cur != d_root->left) cur = cur->right;
+    while (cur->right != d_end && 
+            cur->value != value) cur = cur->right;
     
     if (cur->value == value)
     {
-        cur->left->right = cur->right;
-        cur->right->left = cur->left;
-
-        if (cur == d_root) d_root = d_root->right;
-
+        if (this->d_size == 1)
+        {
+            d_root = NULL;
+            d_end->left = d_end->right = d_end;
+        }
+        else
+        {
+            cur->left->right = cur->right;
+            cur->right->left = cur->left;
+            if (cur == d_root) d_root = d_root->right;
+        }
         delete cur;
         --this->d_size;
     }
@@ -217,15 +269,14 @@ void DoubleList<T>::removeAll(T const& value)
     
     //delete forward, from the second to the last
     DoubleNode<T>* cur = d_root;
-    while (cur != d_root->left)
+    while (cur->right != d_end)
     {
         if (cur->value == value)
         {
             cur->left->right = cur->right;
             cur->right->left = cur->left;
-
             if (cur == d_root) d_root = d_root->right;
-
+            
             delete cur;
             --this->d_size;
         }
@@ -235,9 +286,16 @@ void DoubleList<T>::removeAll(T const& value)
     //delete the last one, if it contains the target value
     if (cur->value == value)
     {
-        cur->left->right = cur->right;
-        cur->right->left = cur->left;
-
+        if (this->d_size == 1)
+        {
+            d_root = NULL;
+            d_end->left = d_end->right = d_end;
+        }
+        else
+        {
+            cur->left->right = cur->right;
+            cur->right->left = cur->left;        
+        }
         delete cur;
         --this->d_size;
     }

@@ -14,7 +14,7 @@ OBJS		= my_double_list.t.o \
               $(patsubst %.o,../../iterator/%.o, my_iterator.o) \
 			  $(patsubst %.o,../list/%.o, my_list.o)
 
-CC			= g++
+CC			= g++ --std=c++11 #<limits> to build sentinel node for end() iterator
 CPPFLAGS	= -g -Wall -I. \
                        -I../../iterator \
                        -I../list \
