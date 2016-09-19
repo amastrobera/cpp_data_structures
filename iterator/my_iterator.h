@@ -7,8 +7,6 @@
 #ifndef ITERATOR_H
 #define ITERATOR_H
 
-#include "my_iterator.h"
-
 namespace my_data_structures 
 {
 
