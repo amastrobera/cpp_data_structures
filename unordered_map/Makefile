@@ -11,11 +11,13 @@ LIBS_CPP	= my_unordered_map.cpp
 
 OBJS		= my_unordered_map.t.o \
 			  my_unordered_map.o \
+              $(patsubst %.o,../iterator/%.o, my_iterator.o) \
               $(patsubst %.o,../vector/%.o, my_vector.o) \
 			  $(patsubst %.o,../node/%.o, my_node.o) \
 
 CC			= g++ --std=c++11
 CPPFLAGS	= -g -Wall -I. \
+                       -I../iterator \
 					   -I../vector \
 					   -I../node \
 
