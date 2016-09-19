@@ -14,7 +14,8 @@ Use the "build.sh" script from the root directory of this repo. Help available.
 C++03, naked pointers, built with Makefile
 
 * node, single and RB node
-* vector (dynamic array, can implement Stack/Queue)
+* iterator (interface)
+* vector + iterator (dynamic array, can implement Stack/Queue) 
 * linked_list unordered single (can implement Stack/Queue)
 * linked_list single (sorted)
 * linked_list double (circular, sorted)
@@ -23,8 +24,8 @@ C++03, naked pointers, built with Makefile
 * unordered_map (hash table)
 
 ##### todo #####
+* iterator for list
 * add function delete to set and map (erase)
-* iterators for all 
 * build script concurrent
 
 #### Modifying STL libs ####

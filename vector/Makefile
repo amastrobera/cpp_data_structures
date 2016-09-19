@@ -7,11 +7,11 @@ MAIN		= my_vector.t.cpp
 LIBS_H		= my_vector.h
 LIBS_CPP	= my_vector.cpp
 OBJS		= my_vector.o my_vector.t.o \
-#              $(patsubst %.o,../iterator/%.o, my_iterator.o) \
+              $(patsubst %.o,../iterator/%.o, my_iterator.o) \
 
 CC			= g++
 CPPFLAGS	= -g -Wall -I. \
-#                       -I../iterator \
+                       -I../iterator \
 
 #commands
 build: compile link

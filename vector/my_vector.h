@@ -8,7 +8,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-//#include "my_iterator.h"
+#include "my_iterator.h"
 #include <stdexcept>
 
 namespace my_data_structures 
@@ -42,41 +42,7 @@ public:
     void removeAt(unsigned const k); //deletes the item at index k
     
     //iterators
-    class iterator
-    {
-    public:
-        iterator() : d_item(NULL) {}
-        iterator(T* val) : d_item(val) {}
-        iterator(iterator const& it) : d_item(it.d_item) {}
-        ~iterator() {}
-
-        //advances and retreats
-        iterator& operator++() {++this->d_item; return *this;} //++it
-        iterator& operator++(int unused) {return operator++();} //it++
-        iterator& operator--() {--this->d_item; return *this;} //--it
-        iterator& operator--(int unused) {return operator--();}//it--
-        
-        //dereferences and returns the object pointed to
-        T& operator*() { return *d_item; }
-        T& operator->() { return operator*(); }
-
-        //assignment
-        iterator& operator= (iterator const& it) 
-        { 
-            if (this != &it)
-                this->d_item = it.d_item;
-            return *this;
-        };
-        
-        //comparison operators
-        bool operator==(iterator const& rhs) const
-            {return this->d_item == rhs.d_item;} 
-        bool operator!=(iterator const& rhs) const
-            {return !(operator==(rhs));} 
-
-    private:
-        T* d_item;
-    };
+    class iterator;
     
     iterator begin() const { return iterator(d_array); }
 
@@ -93,23 +59,19 @@ private:
 };
 
 
+template<typename T>
+//iterators
+class Vector<T>::iterator : public Iterator<T>
+{
+public:
 
-//template<typename T>
-//class Vector<T>::iterator : public Iterator<T>
-//{
-//public:
-//    iterator() : Iterator<T>() {}
-//    
-//    iterator(Vector<T>* ds) { this->d_item = ds->d_array;}
-//    
-//    iterator(T* val) : Iterator<T>(val) {}
-//    
-//protected:
-//    virtual void increment() { ++this->d_item; }
-//    
-//    virtual void decrement() { --this->d_item; }
-//};
+    iterator(T* val) : Iterator<T>(val) {}
 
+protected:
+    virtual void increment() { ++this->d_item; }
+    
+    virtual void decrement() { --this->d_item; }
+};
 
 
 template<typename T>
