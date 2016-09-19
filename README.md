@@ -16,8 +16,8 @@ C++03, naked pointers, built with Makefile
 * node, single and RB node
 * iterator (interface)
 * vector + iterator (dynamic array, can implement Stack/Queue) 
-* linked_list unordered single (can implement Stack/Queue)
-* linked_list single (sorted)
+* linked_list unordered single + iterator (can implement Stack/Queue)
+* linked_list single + iterator (sorted)
 * linked_list double (circular, sorted)
 * set (RB tree)
 * map (RB tree)
