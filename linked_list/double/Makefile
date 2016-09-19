@@ -11,10 +11,14 @@ LIBS_CPP	= my_double_list.cpp
 
 OBJS		= my_double_list.t.o \
 			  my_double_list.o \
+              $(patsubst %.o,../../iterator/%.o, my_iterator.o) \
 			  $(patsubst %.o,../list/%.o, my_list.o)
 
 CC			= g++
-CPPFLAGS	= -g -Wall -I. -I../list -I../../node
+CPPFLAGS	= -g -Wall -I. \
+                       -I../../iterator \
+                       -I../list \
+                       -I../../node \
 
 #commands
 build: compile link

@@ -10,10 +10,15 @@ LIBS_H		= my_single_list.h
 LIBS_CPP	= my_single_list.cpp
 
 OBJS		= my_single_list.t.o \
-			  $(patsubst %.o,../unsorted/%.o, my_single_unsorted_list.o)
+              $(patsubst %.o,../../../iterator/%.o, my_iterator.o) \
+			  $(patsubst %.o,../unsorted/%.o, my_single_unsorted_list.o) \
 
 CC			= g++
-CPPFLAGS	= -g -Wall -I. -I../unsorted -I../../list -I../../../node
+CPPFLAGS	= -g -Wall -I. \
+                       -I../unsorted \
+                       -I../../list \
+                       -I../../../iterator \
+                       -I../../../node \
 
 #commands
 build: compile link

@@ -31,6 +31,9 @@ public:
     //deleting the returned pointer will compromise the who class structure
     std::pair< SingleNode<T>*, bool > find(T const& value);
     
+    //iterators
+    //inherited from unsorted list with no modifications to do
+    
 };
 
 template<typename T> 

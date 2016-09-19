@@ -11,11 +11,13 @@ LIBS_CPP	= my_set.cpp
 
 OBJS		= my_set.t.o \
 			  my_set.o \
+              $(patsubst %.o,../iterator/%.o, my_iterator.o) \
               $(patsubst %.o,../linked_list/single/unsorted/%.o, \
-			  my_single_unsorted_list.o)
+			  my_single_unsorted_list.o) \
 
 CC			= g++
 CPPFLAGS	= -g -Wall -I. \
+                       -I../iterator \
 					   -I../node \
 			           -I../linked_list/list \
 					   -I../linked_list/single/unsorted

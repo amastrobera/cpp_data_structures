@@ -54,8 +54,22 @@ void testSingleUnsortedList()
     intList.remove(4);
     assert (5 == intList.size() && "    >>> failed size post-remove");
     assert (1 == intList.at(1) && "    >>> failed at() post-remove");
-
     //list: 3, 1, 3, 4, 2
+
+    //iterator
+    std::cout << "    * iterator" << std::endl;
+    SingleUnsortedList<int>::iterator it = intList.begin();
+    assert (3 == *it && "    >>> failed");
+    ++it;
+    assert (1 == *it && "    >>> failed");
+    --it; //has no effect on a forward list
+    assert (1 == *it && "    >>> failed");
+    ++it; ++it; ++it; ++it; 
+    assert (intList.end() == it && "    >>> failed");
+    unsigned i = 0;
+    for (it = intList.begin(); it != intList.end(); ++it)
+        std::cout << "iter(" << ++i << "): " << *it << " >> ";
+    std::cout << std::endl;
 
     //removeAll
     std::cout << "    * removeAll" << std::endl;

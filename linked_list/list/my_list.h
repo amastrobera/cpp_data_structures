@@ -3,6 +3,7 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include "my_iterator.h"
 #include "my_node.h"
 
 namespace my_data_structures 
@@ -41,8 +42,31 @@ public:
     //adds a value at the bottom of the list
     virtual void removeAll(T const& value) = 0;
     
+    //iterators: need to implement "begin()" and "end()" in the derived classes
+    class iterator;
+    
 protected:
+
     unsigned d_size;
+    
+};
+
+//iterators
+template<typename T>
+class List<T>::iterator : public Iterator<T>
+{
+public:
+
+    iterator() : Iterator<T>() {}
+
+    iterator(T* val) : Iterator<T>(val) {}
+
+protected:
+
+    virtual void increment() = 0;
+    
+    void decrement() {} //nothing to implement, except for doubly linked lists
+    
 };
 
 

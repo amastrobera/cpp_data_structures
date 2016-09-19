@@ -59,8 +59,8 @@ private:
 };
 
 
-template<typename T>
 //iterators
+template<typename T>
 class Vector<T>::iterator : public Iterator<T>
 {
 public:

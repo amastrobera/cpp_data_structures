@@ -8,7 +8,7 @@ makeAllWithOptions()
     cd $build_path/iterator
     make $1
 
-	#make array
+    #make array
     cd $build_path/vector
     make $1
 

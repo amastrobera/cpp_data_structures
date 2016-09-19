@@ -40,8 +40,47 @@ public:
     //adds a value at the bottom of the list
     virtual void removeAll(T const& value);
     
+    //iterators
+    class iterator;
+    
+    virtual iterator begin() const { return iterator(d_root); }
+
+    virtual iterator end() const { return iterator(); } //NULL = end of list
+    
 protected:
+
     SingleNode<T>* d_root;
+    
+};
+
+
+//iterators
+template<typename T>
+class SingleUnsortedList<T>::iterator : public List<T>::iterator
+{
+public:
+
+    iterator() : List<T>::iterator(), d_node(NULL) {}
+    
+    iterator(SingleNode<T>* node) : List<T>::iterator(&node->value),
+                                    d_node(node) {}
+
+protected:
+
+    SingleNode<T>* d_node;
+
+    virtual void increment()
+    {
+        if (this->d_node)
+        {
+            this->d_node = this->d_node->next;
+            if (this->d_node)
+                this->d_item = &this->d_node->value;
+            else
+                this->d_item = NULL;
+        }
+    }
+    
 };
 
 
