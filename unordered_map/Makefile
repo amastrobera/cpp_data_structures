@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_unordered_map
+PROG		= my_unordered_map.tst
 
 MAIN		= my_unordered_map.t.cpp
 

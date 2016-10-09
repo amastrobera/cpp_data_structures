@@ -17,7 +17,7 @@ template<typename T>
 class SingleUnsortedList : public List<T>
 {
 public:
-    SingleUnsortedList() : List<T>(), d_root(NULL) {}
+    SingleUnsortedList() : List<T>(), d_root(NULL), d_last(NULL) {}
 
     virtual ~SingleUnsortedList();
 
@@ -50,7 +50,9 @@ public:
 protected:
 
     SingleNode<T>* d_root;
-    
+
+    SingleNode<T>* d_last; //special pointer to improve performance of FIFO
+                          // ADT implementations
 };
 
 
@@ -100,15 +102,22 @@ SingleUnsortedList<T>::~SingleUnsortedList()
 template<typename T> 
 void SingleUnsortedList<T>::append(T const& value)
 {
+    SingleNode<T>* node = new SingleNode<T>(value);
     if (!d_root)
     {
-        d_root = new SingleNode<T>(value);
+        d_last = d_root = node;
         ++this->d_size;
         return;
     }
-    SingleNode<T>* cur = d_root;
-    while (cur->next) cur = cur->next;
-    cur->next = new SingleNode<T>(value);    
+//    while (cur->next) cur = cur->next;
+//    cur->next = node;
+    if (!d_last)
+        d_last = node;
+    else
+    {
+        d_last->next = node;
+        d_last = d_last->next;
+    }
     ++this->d_size;
 }
 
@@ -118,6 +127,7 @@ void SingleUnsortedList<T>::insert(T const& value)
     SingleNode<T>* node = new SingleNode<T>(value);
     node->next = d_root;
     d_root = node;
+    if (this->d_size == 0) d_last = d_root;
     ++this->d_size;
 }
 
@@ -153,9 +163,10 @@ T SingleUnsortedList<T>::pop()
     T retVal = d_root->value;
     
     SingleNode<T>* cur = d_root;
-    d_root = d_root->next;    
+    d_root = d_root->next;
     delete cur;
     --this->d_size;
+    if (this->d_size == 0) d_last = NULL;
     return retVal;
 }
 
@@ -169,6 +180,7 @@ void SingleUnsortedList<T>::remove(T const& value)
     {
         SingleNode<T>* cur = d_root;
         d_root = d_root->next;
+        if (cur == d_last) d_last = cur->next;
         delete cur;
         --this->d_size;
         return;
@@ -181,7 +193,8 @@ void SingleUnsortedList<T>::remove(T const& value)
         cur->next->value == value)
     {
         SingleNode<T>* tgt = cur->next;
-        cur->next = cur->next->next;    
+        cur->next = cur->next->next;
+        if (tgt == d_last) d_last = cur;
         delete tgt;
         --this->d_size;    
     }
@@ -198,6 +211,7 @@ void SingleUnsortedList<T>::removeAll(T const& value)
     {
         if (cur->next->value == value)
         {
+            if (d_last == cur->next) d_last = cur;
             SingleNode<T>* tgt = cur->next;
             cur->next = cur->next->next;    
             delete tgt;
@@ -214,7 +228,9 @@ void SingleUnsortedList<T>::removeAll(T const& value)
         d_root = d_root->next;
         delete cur;
         --this->d_size;
+        if (this->d_size == 0) d_last = NULL;
     }
+
 }
 
 } //my_data_structures

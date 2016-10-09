@@ -70,7 +70,8 @@ void testSingleList()
     std::pair< SingleNode<int>*, bool > notFound = intList.find(5);
     assert (false == notFound.second && "    >>> failed not found(5)");
     assert (NULL == notFound.first && "    >>> failed not found(5)");
-    
+
+    std::cout << "OK" << std::endl;
 }
 
 

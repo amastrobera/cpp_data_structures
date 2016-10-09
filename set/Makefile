@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_set
+PROG		= my_set.tst
 
 MAIN		= my_set.t.cpp
 

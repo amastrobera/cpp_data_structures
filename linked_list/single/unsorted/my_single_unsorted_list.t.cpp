@@ -31,15 +31,15 @@ void testSingleUnsortedList()
     assert (0 == intList.pop() && "    >>> failed pop");
     assert (1 == intList.size() && "    >>> failed size");
     
+    
+    //top and bottom
+    std::cout << "    * top and bottom" << std::endl;
     intList.insert(4);
     intList.insert(3);
     intList.append(3);
     intList.append(4);
     intList.append(2);
     //list: 3, 4, 1, 3, 4, 2
-    
-    //top and bottom
-    std::cout << "    * top and bottom" << std::endl;
     assert (3 == intList.top() && "    >>> failed top");
     assert (2 == intList.bottom() && "    >>> failed bottom");
     

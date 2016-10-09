@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_stack
+PROG		= my_stack.tst
 
 MAIN		= my_stack.t.cpp
 

@@ -29,8 +29,6 @@ public:
     virtual void enqueue(T const& item)
     {
         SingleUnsortedList<T>::append(item); 
-        //todo: improve the append function in unsorted list
-        //      with a d_last pointer to append things, in O(1) instead of O(N)
     }
     
     virtual T const& first() const

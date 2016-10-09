@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_single_unsorted_list
+PROG		= my_single_unsorted_list.tst
 
 MAIN		= my_single_unsorted_list.t.cpp
 

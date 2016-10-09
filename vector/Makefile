@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_my_vector
+PROG		= my_vector.tst
 
 MAIN		= my_vector.t.cpp
 LIBS_H		= my_vector.h

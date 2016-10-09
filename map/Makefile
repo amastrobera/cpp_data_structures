@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_map
+PROG		= my_map.tst
 
 MAIN		= my_map.t.cpp
 

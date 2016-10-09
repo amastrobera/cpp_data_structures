@@ -29,8 +29,8 @@ C++03, naked pointers, built with Makefile
 * queue
 
 ##### todo #####
-* better perf of unsorted_list to make Queue better
-* iterator for set, map, hashtable
+* BF: "make memory" for unordered_map and double_list
+* iterator for set, map, hashtable, stack, queue
 * add function delete to set and map (erase)
 * build script concurrent
 

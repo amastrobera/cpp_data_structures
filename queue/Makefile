@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_queue
+PROG		= my_queue.tst
 
 MAIN		= my_queue.t.cpp
 

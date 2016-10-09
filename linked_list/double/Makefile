@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_double_list
+PROG		= my_double_list.tst
 
 MAIN		= my_double_list.t.cpp
 

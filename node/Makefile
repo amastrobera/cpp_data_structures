@@ -1,7 +1,7 @@
 # Makefile for C++ test application
 
 #variables 
-PROG		= test_my_node
+PROG		= my_node.tst
 
 MAIN		= my_node.t.cpp
 LIBS_H		= my_node.h
