@@ -15,15 +15,21 @@ C++03, naked pointers, built with Makefile
 
 * node, single and RB node
 * iterator (interface)
-* vector + iterator (dynamic array, can implement Stack/Queue) 
-* linked_list unordered single + iterator (can implement Stack/Queue)
+* vector + iterator (dynamic array) 
+* linked_list unordered single + iterator
 * linked_list single + iterator (sorted)
 * linked_list double + iterator (circular, sorted)
 * set (RB tree)
 * map (RB tree)
 * unordered_map (hash table)
+* adt (abstract data types) interfaces
+	* stack 
+	* queue
+* stack
+* queue
 
 ##### todo #####
+* better perf of unsorted_list to make Queue better
 * iterator for set, map, hashtable
 * add function delete to set and map (erase)
 * build script concurrent

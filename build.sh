@@ -40,6 +40,17 @@ makeAllWithOptions()
 	cd $build_path/unordered_map
 	make $1
 
+	#adt interfaces
+	cd $build_path/adt
+	cd stack
+	make $1
+	cd ../queue
+	make $1
+
+	#concrete classes of adt
+	cd $build_path/stack
+	make $1
+
     #finish, come back
     cd $build_path
 }

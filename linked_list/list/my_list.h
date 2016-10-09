@@ -29,9 +29,9 @@ public:
     virtual void insert(T const& value) = 0;
     
     //returns the item at the beginning
-    virtual T& top() = 0;
+    virtual T const& top() const = 0;
     //returns the item at the end of the list
-    virtual T& bottom() = 0;
+    virtual T const& bottom() const = 0;
     //returns the k-th item of the list; throws it out of range
     virtual T& at(unsigned const k) = 0;
     //returns the item ats the top of the list and deletes it
