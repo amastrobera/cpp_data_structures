@@ -10,6 +10,17 @@ If the implementation includes naked pointers, memory leaks are checked with Val
 ### How to build it  ###
 Use the "build.sh" script from the root directory of this repo. Help available. 
 
+### More about build.sh: how to test ###
+$ ./build.sh <opt>
+    <opt>
+    default: compile and link them to tsk
+    -e | --clean: clean obj files and tsk
+    -c | --compile: compile
+    -l | --link: link compiled to tsk
+    -t | --test: run unit test 
+    -m | --memory: run valgrind test on memory usage
+
+
 #### Making containiers from scratch  ####
 C++03, naked pointers, built with Makefile
 

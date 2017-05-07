@@ -4,6 +4,10 @@
 
 makeAllWithOptions()
 {
+    #make bit array
+    cd $build_path/bit_array
+    make $1
+
     #make iterator
     cd $build_path/iterator
     make $1
