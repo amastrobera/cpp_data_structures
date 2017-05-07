@@ -24,6 +24,7 @@ $ ./build.sh <opt>
 #### Making containiers from scratch  ####
 C++03, naked pointers, built with Makefile
 
+* bit array
 * node, single and RB node
 * iterator (interface)
 * vector + iterator (dynamic array) 
