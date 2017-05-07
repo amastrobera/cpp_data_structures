@@ -17,6 +17,10 @@ class BitArray
 public:
     BitArray(unsigned int size=bit_array_default_size); 
 
+    BitArray(BitArray const& bitArray); 
+
+    BitArray& operator=(BitArray const& bitArray);
+
     ~BitArray() {}
 
     inline unsigned int size() const { return d_size; }

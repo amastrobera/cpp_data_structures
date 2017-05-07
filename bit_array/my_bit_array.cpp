@@ -5,8 +5,24 @@ namespace my_data_structures
 
 BitArray::BitArray(unsigned int size) 
     : d_size(size), d_array( ~(~(1 << size)) ) 
-    {}
+{
+    //nothing
+}
 
+BitArray::BitArray(BitArray const& bitArray)
+{
+    *this = bitArray;
+}
+
+BitArray& BitArray::operator=(BitArray const& bitArray)
+{
+    if (this != &bitArray)
+    {
+        d_size = bitArray.d_size;
+        d_array = bitArray.d_array;
+    }
+    return *this;
+}
 
 void BitArray::set(unsigned int const k, bool value)
 {
