@@ -12,7 +12,7 @@ Use the "build.sh" script from the root directory of this repo. Help available.
 
 ### More about build.sh: how to test ###
 $ ./build.sh <opt>
-    <opt>
+
     default: compile and link them to tsk
     -e | --clean: clean obj files and tsk
     -c | --compile: compile
@@ -47,4 +47,3 @@ C++03, naked pointers, built with Makefile
 
 #### Modifying STL libs ####
 * interval map (derived from c++11 std::map)
-
