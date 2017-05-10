@@ -1,3 +1,4 @@
+// #include "my_string.h"
 #include "my_vector.h"
 
 #include <cassert>
@@ -6,6 +7,7 @@
 void testVector()
 {
     using my_data_structures::Vector;
+    // using my_data_structures::String;
     
     std::cout << "testVector ... " << std::endl;
 
@@ -65,6 +67,17 @@ void testVector()
     dyno.removeAt(1);
     assert (1 == dyno.size() && "    >>> failed");
 
+
+    // //join
+    // std::cout << "    * join (from vector)" << std::endl;
+    // Vector<String> vec(10);
+    // vec.append("ciao");
+    // vec.append("bello");
+    // vec.append("come");
+    // vec.append("va");
+    // vec.append("?");
+    // String s = String::join(vec, ' ');
+    // assert ("ciao bello come va ?" == s && "    >>> failed");
     
     std::cout << "OK" << std::endl;
 }

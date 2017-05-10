@@ -36,6 +36,8 @@ public:
     T& bottom();
     
     T& operator[](unsigned const k);
+
+    T const& operator[](unsigned const k) const;
     
     T pop();
     
@@ -130,6 +132,15 @@ T& Vector<T>::operator[](unsigned const k)
     if (k >= d_size) throw std::runtime_error("not value for this index");
     return d_array[k];
 }
+
+
+template<typename T>
+T const& Vector<T>::operator[](unsigned const k) const
+{
+    if (k >= d_size) throw std::runtime_error("not value for this index");
+    return d_array[k];
+}
+
 
 template<typename T>    
 T Vector<T>::pop()

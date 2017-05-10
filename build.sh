@@ -12,12 +12,12 @@ makeAllWithOptions()
     cd $build_path/iterator
     make $1
 
-    #make string
-    cd $build_path/string
-    make $1
-
     #make array
     cd $build_path/vector
+    make $1
+ 
+    #make string
+    cd $build_path/string
     make $1
 
     #make node

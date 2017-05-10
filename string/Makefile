@@ -8,10 +8,12 @@ LIBS_H		= my_string.h
 LIBS_CPP	= my_string.cpp
 OBJS		= my_string.o my_string.t.o \
               $(patsubst %.o,../iterator/%.o, my_iterator.o) \
+              $(patsubst %.o,../vector/%.o, my_vector.o) \
 
 CC			= g++
 CPPFLAGS	= -g -Wall -I. \
                        -I../iterator \
+                       -I../vector \
 
 #commands
 build: compile link

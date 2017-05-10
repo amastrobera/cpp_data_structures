@@ -66,18 +66,12 @@ String& String::operator=(String const& assigned)
     return *this;
 }
 
-String& String::operator+(String const& assigned)
-{
-    if (assigned.d_size != 0)
-        upSize(assigned.d_size, assigned.d_array);
-    return *this;
-}
 
 String& String::operator+=(String const& compared)
 {
     if (this != &compared)
     {
-        char* newArray = new char[d_size + compared.d_size + 1];
+        char* newArray = new char[d_size + compared.d_size];
         for (unsigned i = 0; i < d_size; ++i)
             newArray[i] = d_array[i];
 
@@ -103,7 +97,7 @@ String& String::operator+=(char const* c_str)
     }
     if (c_len)
     {
-        char* newArray = new char[d_size + c_len + 1];
+        char* newArray = new char[d_size + c_len];
         for (unsigned i = 0; i < d_size; ++i)
             newArray[i] = d_array[i];
 
@@ -118,6 +112,24 @@ String& String::operator+=(char const* c_str)
     return *this;
 }
 
+String& String::operator+=(char const c_str)
+{
+    unsigned int c_len = 1;
+    char* newArray = new char[d_size + c_len];
+
+    for (unsigned i = 0; i < d_size; ++i)
+        newArray[i] = d_array[i];
+
+
+    newArray[d_size] = c_str;
+    newArray[d_size + c_len] = STRING_END;
+
+    delete[] d_array;
+    d_size += c_len;
+    d_array = newArray;
+
+    return *this;
+}
 
 char String::operator[](unsigned const k)
 {
@@ -131,6 +143,64 @@ char String::operator[](unsigned const k) const
     if (k >= d_size)
         throw std::runtime_error("out of bounds");
     return d_array[k];
+}
+
+
+Vector<String> String::split(char delimiter, 
+                             char hardQuotes,
+                             char softQuotes)
+{
+    Vector<String> temp;
+    
+    bool openHardQuotes = false;
+    bool openSoftQuotes = false;
+
+    unsigned int i = 0;
+    String item;
+    int missing = d_size;
+
+    while (i < d_size)
+    {
+        if (d_array[i] == softQuotes )
+        {
+            openSoftQuotes = !openSoftQuotes;
+        }
+        else if (d_array[i] == hardQuotes)
+        {
+            openHardQuotes = !openHardQuotes;
+            openSoftQuotes = false;
+        }
+        
+        if (d_array[i] == delimiter && !openHardQuotes && !openSoftQuotes)
+        {
+            temp.append(item);
+            missing -= item.d_size;
+            item = "";
+        }
+        else
+        {
+            item += d_array[i];
+        }
+        ++i;
+    }
+
+    if (missing && item.d_size)
+        temp.append(item); //flush the rest, if any
+
+    return temp;
+}
+
+String String::join(Vector<String> const& vec, char delimiter)
+{
+    String temp;
+    unsigned int n = vec.size();
+    for (unsigned int i = 0; i < n; ++i)
+    {
+        temp += vec[i];
+        if (i != n-1)
+            temp += delimiter;
+    }
+    return temp;
 }
 
 void String::upSize(unsigned int newSize, 

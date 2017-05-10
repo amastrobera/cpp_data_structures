@@ -13,6 +13,7 @@
 #define STRING_H
 
 #include "my_iterator.h"
+#include "my_vector.h"
 #include <stdexcept>
 #include <ostream>
 
@@ -37,9 +38,7 @@ public:
     inline bool empty() const { return !d_size;}
 
     String& operator=(String const& assigned);
-
-    String& operator+(String const& assigned);
-    
+   
     char operator[](unsigned const k);
 
     char operator[](unsigned const k) const;
@@ -51,6 +50,15 @@ public:
     String& operator+=(String const& compared);
 
     String& operator+=(char const* c_str);
+
+    String& operator+=(char const c_str);
+
+    static String join(Vector<String> const& vec, 
+                        char delimiter = ',');
+
+    Vector<String> split(char delimiter=' ',
+                         char hardQuotes = '\"',
+                         char softQuotes = '\'');
 
     // //iterators
     // class iterator;
@@ -73,6 +81,7 @@ bool operator==(char const* c_compared, String const& compared);
 bool operator!=(char const* c_compared, String const& compared);
 
 std::ostream& operator<<(std::ostream& os, String const& input);
+
 
 // //iterators
 // class String::iterator : public Iterator<char>
